@@ -31,12 +31,13 @@ until [ -f $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzbui.exe ]; do
   wine $WINEPREFIX/drive_c/install_backblaze.exe
   echo "Installation finished or aborted, trying to start the Backblaze client..."
   echo "---------------------------------------------------------------------------------------------------------------"
-  echo "Deleting x64 Binaries (we are running x86 only in this Container)!"
-  echo "Without deleting them the Client try continusly starting them and wine will go in Debug Mode = High CPU Load!"
-  echo "When a Message Pops up with Client is not installed correctly....Click OK and ignore. Client will run fine!"
-  rm -r $WINEPREFIX/drive_c/Program\ Files/Backblaze/x64
-  rm $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzfilelist64.exe
-  rm $WINEPREFIX/drive_c/Program\ Files/Backblaze/bztransmit64.exe
+  echo "Renaming x64 Binaries (we are running x86 only in this Container)!"
+  echo "Without renaming them the Client try continusly starting them and wine will go in Debug Mode = High CPU Load!"
+  echo "When a Message Pops up with Client is not installed correctly ignore it and click in the main Client Window to hide the Warning in the background"
+  echo "The Client will run fine!"
+  mv $WINEPREFIX/drive_c/Program\ Files/Backblaze/x64 $WINEPREFIX/drive_c/Program\ Files/Backblaze/x64-DISABLED
+  mv $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzfilelist64.exe $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzfilelist64.exe-DISABLED
+  mv $WINEPREFIX/drive_c/Program\ Files/Backblaze/bztransmit64.exe $WINEPREFIX/drive_c/Program\ Files/Backblaze/bztransmit64.exe-DISABLED
   echo "---------------------------------------------------------------------------------------------------------------"
   wineserver -k
 done

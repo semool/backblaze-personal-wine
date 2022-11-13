@@ -12,7 +12,7 @@ Modifications by semool:
 * Add required Fonts for Openbox Font Issue
 * Disable openbox right click menu (not required)
 * Workaround for fontconfig cache file spam in /var/cache/fontconfig
-* After Backblaze Client Installation deleting ALL x64 Binaries while this is a i386 only Container. Without deleting them the Client try continusly starting them and wine will go in Debug Mode = High CPU Load! When a Message Pops up with Client is not installed correctly ignore it and click in the main Client Window to hide the Warning in the background. Client will run fine!
+* After Backblaze Client Installation renaming ALL x64 Binaries while this is a i386 only Container. Without renaming them the Client try continusly starting them and wine will go in Debug Mode = High CPU Load! When a Message Pops up with Client is not installed correctly ignore it and click in the main Client Window to hide the Warning in the background. Client will run fine!
 * Adding noVNC Webinterface
 
 ## Option for NEW Image: Docker run example
