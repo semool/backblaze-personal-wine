@@ -16,7 +16,7 @@ Modifications by semool:
 * After Backblaze Client Installation renaming ALL x64 Binaries while this is a i386 only Container. Without renaming them the Client try continusly starting them and wine will go in Debug Mode = High CPU Load! When a Message Pops up with Client is not installed correctly ignore it and click in the main Client Window to hide the Warning in the background. Client will run fine!
 * Adding noVNC Webinterface
 
-## Option for NEW Image: Docker run example
+## Docker run example
 <details>
   <summary>Click to expand!</summary>
 
@@ -37,21 +37,15 @@ docker run -d \
     backblaze-personal-wine:x86
 ```
 
-### DATA Dir Tips
-Mount a very Big empty Folder directly to '/data' first. It must have free Space for the bigest File you will Backup.
-The Client uploads big files in Chunks (10MB) and they are temporarily saved here.
-Also a directory '.bzvol' will create here. The Files inside are unique and needed for the client to redetect this as D: Drive.
-Now you can mount all your Folders for Backup inside. you can remove or add Folders at any time (Look in the 'Docker run Example').
-
 ### Connecting to the VNC Server
 To go through the setup process you must connect to the integrated vnc server via a client like RealVNC Client.
-address: your.linux.ip.address:5900
+address: yourip:5900
 user: none (admin)
 password: none
 
 ### Connecting to the VNC Server (Webinterface)
 You can open the noVNC client in your browser (make sure your firewall allows acess to the port):
-address: http://your.linux.ip.address:6080
+address: http://yourip:6080
 
 ### Security
 The server runs an unencrypted integrated VNC server. 
@@ -66,15 +60,20 @@ firewall-cmd --reload
 
 ## Setup guide
 
+### Step 1: DATA Dir Tips
+Mount a very Big empty Folder directly to '/data' first. It must have free Space for the bigest File you will Backup.
+The Client uploads big files in Chunks (10MB) and they are temporarily saved here.
+Also a directory '.bzvol' will create here. The Files inside are unique and needed for the client to redetect this as D: Drive.
+Now you can mount all your Folders for Backup inside. you can remove or add Folders at any time (Look in the 'Docker run Example').
 
-### Step 1: Installation
+### Step 2: Installation
 When starting the container for the first time, it will automatically initialize a new Wine prefix and download & run the backblaze installer.
 
 When you only see a black screen once you are connected press alt-tab to activate the installer window.
 The installer might look a bit weird (all white) at the very beginning. Just enter your backblaze account email into the white box and hit enter, then you should see the rest of the ui.
 Enter your password and hit "Install", the installer will start scanning your drive.
 
-### Step 2: Configuration
+### Step 3: Configuration
 Once the Installer is finished the backblaze client should open automatically.
 
 You will notice that currently only around 10 files are backed up. 
