@@ -5,16 +5,16 @@ Then look no further, this container automatically creates a tiny Wine prefix th
 Please note, Linux specific file attributes (like ownership, acls or permissions) will not be backed up;
 
 Modifications by semool:
-* The Complete Image will have only ~367MB!
+* The Complete Image will have only ~368MB!
 * Set the right Alpine version (3.12)
 * Fix the Wine Install (4.0.3)
-* Add Language Support (Set it in Dockerfile: SETLANGUAGE)
+* Add Language Support
+* Adding user configurable LANGUAGE and TIMEZONE. Defaults are 'en_US.UTF-8' and 'Etc/UTC'
 * Add required Fonts for Openbox Font Issue
 * Disable openbox right click menu (not required)
 * Workaround for fontconfig cache file spam in /var/cache/fontconfig
 * After Backblaze Client Installation renaming ALL x64 Binaries while this is a i386 only Container. Without renaming them the Client try continusly starting them and wine will go in Debug Mode = High CPU Load! When a Message Pops up with Client is not installed correctly ignore it and click in the main Client Window to hide the Warning in the background. Client will run fine!
 * Adding noVNC Webinterface
-* Adding user configurable LANGUAGE and TIMEZONE. Look at the Docker run example. Defaults are 'en_US.UTF8' and 'Etc/UTC'
 
 ## Option for NEW Image: Docker run example
 <details>
@@ -30,7 +30,7 @@ docker run -d \
     -e TZ=Europe/Berlin \
     --name=backblaze \
     --restart=always \
-    backblaze-personal-wine-x86:latest
+    backblaze-personal-wine:x86
 ```
 
 ### Connecting to the VNC Server
