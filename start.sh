@@ -43,7 +43,7 @@ function configure_wine {
   wine reg add "HKCU\\SOFTWARE\\Wine\\Network\\" /v UseDnsComputerName /f /d N &>/dev/null
   wine reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ComputerName" /v ComputerName /f /d $COMPUTER_NAME &>/dev/null
   wine reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ActiveComputerName" /v ComputerName /f /d $COMPUTER_NAME &>/dev/null
-  echo "- Setting WindeDbg BreakOnFirstChance 0 - let applications handle exceptions themselves"
+  echo "- Setting WineDbg BreakOnFirstChance 0 - let applications handle exceptions themselves"
   wine reg add "HKCU\\SOFTWARE\\Wine\\WineDbg\\" /v BreakOnFirstChance /t REG_DWORD /f /d 0 &>/dev/null
   echo "************************************"
 }
