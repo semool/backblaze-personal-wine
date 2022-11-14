@@ -1,11 +1,26 @@
 FROM i386/alpine:3.12.1
 
-# Set your prefered Language
-#ENV SETLANGUAGE=en_US.UTF-8
-ENV SETLANGUAGE=de_DE.UTF-8
+# Not needed for Alpine and Debian Images, but for Ubuntu
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Install required packages
 RUN apk --update --upgrade --no-cache add wine xvfb x11vnc openbox samba-winbind-clients ttf-dejavu
+
+# Install Languages
+ENV MUSL_LOCPATH="/usr/share/i18n/locales/musl"
+RUN apk --no-cache add libintl && \
+    apk --no-cache --virtual .build-deps add cmake make musl-dev gcc gettext-dev git && \
+    git clone https://gitlab.com/rilian-la-te/musl-locales.git && \
+    cd musl-locales && cmake -DLOCALE_PROFILE=OFF -DCMAKE_INSTALL_PREFIX:PATH=/usr . && make && make install && \
+    cd .. && rm -r musl-locales && \
+    apk del .build-deps
+
+# Set Language
+ENV LANGUAGE=$LANGUAGE
+
+# Add Timezone
+RUN apk --no-cache add tzdata
+ENV TZ=$TZ
 
 # Install noVNC
 RUN apk --no-cache add bash python3 procps && apk --no-cache --virtual .build-deps add git build-base python3-dev py-pip && \
@@ -20,18 +35,6 @@ RUN apk --no-cache add bash python3 procps && apk --no-cache --virtual .build-de
 # Replace noVNC Favicon
 COPY icons.zip /opt/noVNC/app/images/icons/
 RUN unzip -o /opt/noVNC/app/images/icons/icons.zip -d /opt/noVNC/app/images/icons/ && rm /opt/noVNC/app/images/icons/icons.zip
-
-# Install Languages
-ENV MUSL_LOCPATH="/usr/share/i18n/locales/musl"
-RUN apk --no-cache add libintl && \
-    apk --no-cache --virtual .build-deps add cmake make musl-dev gcc gettext-dev git && \
-    git clone https://gitlab.com/rilian-la-te/musl-locales.git && \
-    cd musl-locales && cmake -DLOCALE_PROFILE=OFF -DCMAKE_INSTALL_PREFIX:PATH=/usr . && make && make install && \
-    cd .. && rm -r musl-locales && \
-    apk del .build-deps
-
-# Set Language
-ENV LC_ALL $SETLANGUAGE
 
 # Disable openbox right click menu
 COPY rc.xml /root/.config/openbox/rc.xml

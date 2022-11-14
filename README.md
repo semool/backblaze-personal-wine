@@ -14,6 +14,7 @@ Modifications by semool:
 * Workaround for fontconfig cache file spam in /var/cache/fontconfig
 * After Backblaze Client Installation renaming ALL x64 Binaries while this is a i386 only Container. Without renaming them the Client try continusly starting them and wine will go in Debug Mode = High CPU Load! When a Message Pops up with Client is not installed correctly ignore it and click in the main Client Window to hide the Warning in the background. Client will run fine!
 * Adding noVNC Webinterface
+* Adding user configurable LANGUAGE and TIMEZONE. Look at the Docker run example. Defaults are 'en_US.UTF8' and 'Etc/UTC'
 
 ## Option for NEW Image: Docker run example
 <details>
@@ -25,6 +26,8 @@ docker run -d \
     --init \
     -p 5900:5900 \
     -p 6080:6080 \
+    -e LANGUAGE=de_DE.UTF-8 \
+    -e TZ=Europe/Berlin \
     --name=backblaze \
     --restart=always \
     backblaze-personal-wine-x86:latest
