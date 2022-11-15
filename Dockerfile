@@ -8,16 +8,15 @@ RUN apk --update --upgrade --no-cache add wine xvfb x11vnc openbox samba-winbind
 
 # Virtual Packages only for Image Build
 RUN apk --update --no-cache --virtual .build-deps add cmake make musl-dev gcc gettext-dev git \
-    build-base python3-dev py-pip
+    build-base python3-dev
 
 # Install Languages
 ENV MUSL_LOCPATH="/usr/share/i18n/locales/musl"
 RUN git clone https://gitlab.com/rilian-la-te/musl-locales.git && \
     cd musl-locales && cmake -DLOCALE_PROFILE=OFF -DCMAKE_INSTALL_PREFIX:PATH=/usr . && make && make install && \
-    cd .. && rm -r musl-locales
-
-# Install noVNC
-RUN git config --global advice.detachedHead false && git clone https://github.com/novnc/noVNC --branch v1.3.0 /opt/noVNC && \
+    cd .. && rm -r musl-locales && \
+    # Install noVNC
+    git config --global advice.detachedHead false && git clone https://github.com/novnc/noVNC --branch v1.3.0 /opt/noVNC && \
     git clone https://github.com/novnc/websockify --branch v0.10.0 /opt/noVNC/utils/websockify && \
     rm -R /opt/noVNC/.git* && \
     rm -R /opt/noVNC/utils/websockify/.git* && \
