@@ -1,4 +1,4 @@
-# backblaze-personal-wine
+# backblaze-personal-wine-x86
 
 Looking for a (relatively) easy way to backup your personal linux system via Backblaze Personal unlimited? 
 Then look no further, this container automatically creates a tiny Wine prefix that runs the Backblaze personal client to backup any mounted directory in your linux filesystem.
