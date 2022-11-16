@@ -71,6 +71,7 @@ When starting the container for the first time, it will automatically initialize
 
 When you only see a black screen once you are connected press alt-tab to activate the installer window.
 The installer might look a bit weird (all white) at the very beginning. Just enter your backblaze account email into the white box and hit enter, then you should see the rest of the ui.
+Or you can move the Window up/down a little bit, that fixed the view.
 Enter your password and hit "Install", the installer will start scanning your drive.
 
 ### Step 3: Configuration

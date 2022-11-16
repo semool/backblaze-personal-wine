@@ -56,7 +56,8 @@ until [ -f $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzbui.exe ]; do
   configure_wine
   if [ ! -e $WINEPREFIX/drive_c/install_backblaze.exe ]; then
      echo "Downloading the Backblaze personal installer..."
-     wget https://www.backblaze.com/win32/install_backblaze.exe -P $WINEPREFIX/drive_c/
+     wget -O $WINEPREFIX/drive_c/install_backblaze.exe https://secure.backblaze.com/api/install_backblaze?file=bzinstall-win32-8.5.0.627.exe
+     #wget https://www.backblaze.com/win32/install_backblaze.exe -P $WINEPREFIX/drive_c/
      sleep 2
      echo "************************************"
   fi
