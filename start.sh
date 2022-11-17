@@ -1,12 +1,16 @@
 #!/bin/sh
 
-if [ "$TZ" == "" ]; then TZ="Etc/UTC"; fi
+if [ "$CLIENTUPDATE" != "0" ]; then
+   echo "Client Update Mode ON!"
+   touch $WINEPREFIX/drive_c/.CLIENTUPDATE
+   echo "************************************"
+fi
+
 echo $TZ > /etc/timezone
 echo "Setting Timezone to: $TZ"
 date
 echo "************************************"
 
-if [ "$LANGUAGE" == "" ]; then LANGUAGE=en_US.UTF-8; fi
 echo "Setting Language to: $LANGUAGE"
 export LC_ALL=$LANGUAGE
 echo "************************************"
@@ -14,13 +18,11 @@ echo "************************************"
 echo "Starting the VNC Server on Port: 5900"
 rm -f /tmp/.X0-lock
 Xvfb :0 -screen 0 700x570x24 & openbox & x11vnc -nopw -q -forever -loop -shared &>/dev/null &
-#sleep 2
 
 if [ -f /opt/noVNC/utils/novnc_proxy ]; then
   echo "************************************"
   echo "Starting the noVNC Webinterface on Port: 6080"
   /opt/noVNC/utils/novnc_proxy --vnc :5900 &>/dev/null &
-  #sleep 2
 fi
 
 function configure_wine {
@@ -48,20 +50,8 @@ function configure_wine {
   echo "************************************"
 }
 
-until [ -f $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzbui.exe ]; do
-  echo "************************************"
-  echo "Backblaze not installed - Initializing the wine prefix..."
-  wineboot -i -u
-  echo "************************************"
-  configure_wine
-  if [ ! -e $WINEPREFIX/drive_c/install_backblaze.exe ]; then
-     echo "Downloading the Backblaze personal installer..."
-     wget -O $WINEPREFIX/drive_c/install_backblaze.exe https://secure.backblaze.com/api/install_backblaze?file=bzinstall-win32-8.5.0.627.exe
-     #wget https://www.backblaze.com/win32/install_backblaze.exe -P $WINEPREFIX/drive_c/
-     sleep 2
-     echo "************************************"
-  fi
-  echo "Backblaze installer started, please go through the graphical setup in by logging onto the containers vnc server"
+function install_backblaze {
+  echo "Backblaze installer started, please go through the graphical setup by logging onto the containers [no]VNC server"
   wine $WINEPREFIX/drive_c/install_backblaze.exe
   echo "************************************"
   echo "Installation finished or aborted! Lets check..."
@@ -71,18 +61,55 @@ until [ -f $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzbui.exe ]; do
   echo "When a Message Pops up with 'Client is not installed correctly' ignore it and click in the main Client Window to hide the Warning in the background"
   echo "The Client will run fine!"
   if [ -e $WINEPREFIX/drive_c/Program\ Files/Backblaze/x64 ]; then
-     mv $WINEPREFIX/drive_c/Program\ Files/Backblaze/x64 $WINEPREFIX/drive_c/Program\ Files/Backblaze/x64-DISABLED
+     if [ -e $WINEPREFIX/drive_c/Program\ Files/Backblaze/x64-DISABLED ]; then 
+        rm -rf $WINEPREFIX/drive_c/Program\ Files/Backblaze/x64-DISABLED
+     fi
+     mv -f $WINEPREFIX/drive_c/Program\ Files/Backblaze/x64 $WINEPREFIX/drive_c/Program\ Files/Backblaze/x64-DISABLED
   fi
   if [ -e $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzfilelist64.exe ]; then
-     mv $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzfilelist64.exe $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzfilelist64.exe-DISABLED
+     mv -f $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzfilelist64.exe $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzfilelist64.exe-DISABLED
   fi
   if [ -e $WINEPREFIX/drive_c/Program\ Files/Backblaze/bztransmit64.exe ]; then
-     mv $WINEPREFIX/drive_c/Program\ Files/Backblaze/bztransmit64.exe $WINEPREFIX/drive_c/Program\ Files/Backblaze/bztransmit64.exe-DISABLED
+     mv -f $WINEPREFIX/drive_c/Program\ Files/Backblaze/bztransmit64.exe $WINEPREFIX/drive_c/Program\ Files/Backblaze/bztransmit64.exe-DISABLED
   fi
   echo "************************************"
   echo "Trying to start the Backblaze client..."
   wineserver -k
+}
+
+until [ -f $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzbui.exe ]; do
+  echo "************************************"
+  echo "Backblaze not installed - Initializing the wine prefix..."
+  wineboot -i -u
+  echo "************************************"
+  configure_wine
+  if [ ! -e $WINEPREFIX/drive_c/install_backblaze.exe ]; then
+     echo "Downloading the Backblaze personal installer..."
+     wget -O $WINEPREFIX/drive_c/install_backblaze.exe https://secure.backblaze.com/api/install_backblaze?file=bzinstall-win32-8.5.0.627.exe
+     sleep 2
+     echo "************************************"
+  fi
+  install_backblaze
 done
+
+if [ -e $WINEPREFIX/drive_c/.CLIENTUPDATE ]; then
+  echo "************************************"
+  configure_wine
+  echo "Update Mode! Downloading the newest Client and starting install..."
+  DATE=$(date '+%Y-%m-%d-%H.%M')
+  if [ -e $WINEPREFIX/drive_c/install_backblaze.exe ]; then
+    echo "Renaming old Installer to: $WINEPREFIX/drive_c/install_backblaze.exe_$DATE"
+    mv -f $WINEPREFIX/drive_c/install_backblaze.exe $WINEPREFIX/drive_c/install_backblaze.exe_$DATE
+  fi
+  echo "************************************"
+  echo "Downloading the Backblaze personal installer..."
+  wget https://www.backblaze.com/win32/install_backblaze.exe -P $WINEPREFIX/drive_c/
+  sleep 2
+  CLIENTUPDATE=0
+  rm -f $WINEPREFIX/drive_c/.CLIENTUPDATE
+  echo "************************************"
+  install_backblaze
+fi
 
 if [ -f $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzbui.exe ]; then
   echo "************************************"

@@ -28,6 +28,7 @@ docker run -d \
     -p 6080:6080 \
     -e LANGUAGE=de_DE.UTF-8 \
     -e TZ=Europe/Berlin \
+    -e CLIENTUPDATE=0 \ # <- Set this to 1 for Client Update/Reinstall
     -v backblaze_data:/wine \ #<- This can be a Docker Volume
     -v /mnt/backblaze-temp:/data \ #<- This must be a Folder that is big enough to save the bigest file from your Backup (look at 'Data Dir Tips')
     -v /mnt/backupfolder1:/data/backupfolder1 \ #<- A Folder that should be Backuped
@@ -90,3 +91,9 @@ Depending on the number and size of the files you want to back up and your uploa
 If you have to stop the container during the initial backup the backup will continue where it left once the container is started again.
 
 Backblaze is now configured to automatically backup your linux files,  to check the progress or change settings use the VNC Server.
+
+### Step 4: Client Update
+To reinstall/update the Client start the Container with '-e CLIENTUPDATE=1'
+The old Installer will be renamed and then the actual one will be downloaded.
+After this the Installation will start. Go to the VNC Server to complete. The Client will start automaticaly after this.
+When you restart the complete Container set 'CLIENTUPDATE' back to 0.

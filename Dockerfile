@@ -35,16 +35,19 @@ RUN unzip -o /opt/noVNC/app/images/icons/icons.zip -d /opt/noVNC/app/images/icon
 COPY rc.xml /root/.config/openbox/rc.xml
 
 # Set Language
-ENV LANGUAGE=$LANGUAGE
+ENV LANGUAGE=en_US.UTF-8
 
 # Set Timezone
-ENV TZ=$TZ
+ENV TZ=Etc/UTC
 
 # Configure the virtual display port
 ENV DISPLAY :0
 
 # Expose the VNC and noVNC-Web port
 EXPOSE 5900 6080
+
+# redownload Client for update/reinstall
+ENV CLIENTUPDATE=0
 
 # Configure the wine prefix location
 RUN mkdir /wine
