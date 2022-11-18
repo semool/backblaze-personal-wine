@@ -1,5 +1,10 @@
 #!/bin/sh
 
+echo "Setting x86 Path for Backblaze Client"
+BZPATH="$WINEPREFIX/drive_c/Program Files/Backblaze/bzbui.exe"
+BZPATHROOT="$WINEPREFIX/drive_c/Program Files/Backblaze"
+echo "************************************"
+
 if [ "$CLIENTUPDATE" != "0" ]; then
    echo "Client Update Mode ON!"
    touch $WINEPREFIX/drive_c/.CLIENTUPDATE
@@ -57,34 +62,40 @@ function configure_wine {
   echo "************************************"
 }
 
+function rename_x64 {
+  if [ -e "$BZPATHROOT/x64" -o -e "$BZPATHROOT/bzfilelist64.exe" -o -e "$BZPATHROOT/bztransmit64.exe" ]; then
+     echo "Try to renaming x64 Binaries (we are running x86 only in this Container)!"
+     echo "Without renaming them the Client try continusly starting them and wine will go in Debug Mode = High CPU Load!"
+     echo "When a Message Pops up with 'Client is not installed correctly' ignore it and click in the main Client Window to hide the Warning in the background"
+     echo "The Client will run fine!"
+     echo "************************************"
+  fi
+  if [ -e "$BZPATHROOT/x64" ]; then
+     if [ -e "$BZPATHROOT/x64-DISABLED" ]; then
+        rm -rf "$BZPATHROOT/x64-DISABLED"
+     fi
+     mv -f "$BZPATHROOT/x64" "$BZPATHROOT/x64-DISABLED"
+  fi
+  if [ -e "$BZPATHROOT/bzfilelist64.exe" ]; then
+     mv -f "$BZPATHROOT/bzfilelist64.exe" "$BZPATHROOT/bzfilelist64.exe-DISABLED"
+  fi
+  if [ -e "$BZPATHROOT/bztransmit64.exe" ]; then
+     mv -f "$BZPATHROOT/bztransmit64.exe" "$BZPATHROOT/bztransmit64.exe-DISABLED"
+  fi
+}
+
 function install_backblaze {
   echo "Backblaze installer started, please go through the graphical setup by logging onto the containers [no]VNC server"
   wine $WINEPREFIX/drive_c/install_backblaze.exe
   echo "************************************"
   echo "Installation finished or aborted! Lets check..."
   echo "************************************"
-  echo "Try to renaming x64 Binaries (we are running x86 only in this Container)!"
-  echo "Without renaming them the Client try continusly starting them and wine will go in Debug Mode = High CPU Load!"
-  echo "When a Message Pops up with 'Client is not installed correctly' ignore it and click in the main Client Window to hide the Warning in the background"
-  echo "The Client will run fine!"
-  if [ -e $WINEPREFIX/drive_c/Program\ Files/Backblaze/x64 ]; then
-     if [ -e $WINEPREFIX/drive_c/Program\ Files/Backblaze/x64-DISABLED ]; then 
-        rm -rf $WINEPREFIX/drive_c/Program\ Files/Backblaze/x64-DISABLED
-     fi
-     mv -f $WINEPREFIX/drive_c/Program\ Files/Backblaze/x64 $WINEPREFIX/drive_c/Program\ Files/Backblaze/x64-DISABLED
-  fi
-  if [ -e $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzfilelist64.exe ]; then
-     mv -f $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzfilelist64.exe $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzfilelist64.exe-DISABLED
-  fi
-  if [ -e $WINEPREFIX/drive_c/Program\ Files/Backblaze/bztransmit64.exe ]; then
-     mv -f $WINEPREFIX/drive_c/Program\ Files/Backblaze/bztransmit64.exe $WINEPREFIX/drive_c/Program\ Files/Backblaze/bztransmit64.exe-DISABLED
-  fi
-  echo "************************************"
+  rename_x64
   echo "Trying to start the Backblaze client..."
   wineserver -k
 }
 
-until [ -f $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzbui.exe ]; do
+until [ -f "$BZPATH" ]; do
   echo "************************************"
   echo "Backblaze not installed - Initializing the wine prefix..."
   wineboot -i -u
@@ -118,9 +129,9 @@ if [ -e $WINEPREFIX/drive_c/.CLIENTUPDATE ]; then
   install_backblaze
 fi
 
-if [ -f $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzbui.exe ]; then
+if [ -f "$BZPATH" ]; then
   echo "************************************"
   configure_wine
   echo "Backblaze found, starting the Backblaze client..."
-  wine $WINEPREFIX/drive_c/Program\ Files/Backblaze/bzbui.exe -noqiet
+  wine "$BZPATH" -noqiet
 fi
