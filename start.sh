@@ -23,12 +23,11 @@ echo "************************************"
 echo "Starting the VNC Server on Port: 5900"
 rm -f /tmp/.X0-lock
 Xvfb :0 -screen 0 910x730x24 & openbox & x11vnc -nopw -q -forever -loop -shared &>/dev/null &
+echo "************************************"
 
-if [ -f /opt/noVNC/utils/novnc_proxy ]; then
-  echo "************************************"
-  echo "Starting the noVNC Webinterface on Port: 6080"
-  /opt/noVNC/utils/novnc_proxy --vnc :5900 &>/dev/null &
-fi
+echo "Starting the noVNC Webinterface on Port: 6080"
+/opt/noVNC/utils/novnc_proxy --vnc :5900 &>/dev/null &
+echo "************************************"
 
 function configure_wine {
   echo "Configure Wine..."
@@ -96,7 +95,6 @@ function install_backblaze {
 }
 
 until [ -f "$BZPATH" ]; do
-  echo "************************************"
   echo "Backblaze not installed - Initializing the wine prefix..."
   wineboot -i -u
   echo "************************************"
@@ -111,7 +109,6 @@ until [ -f "$BZPATH" ]; do
 done
 
 if [ -e $WINEPREFIX/drive_c/.CLIENTUPDATE ]; then
-  echo "************************************"
   configure_wine
   echo "Update Mode! Downloading the newest Client and starting install..."
   DATE=$(date '+%Y-%m-%d-%H.%M')
@@ -130,7 +127,6 @@ if [ -e $WINEPREFIX/drive_c/.CLIENTUPDATE ]; then
 fi
 
 if [ -f "$BZPATH" ]; then
-  echo "************************************"
   configure_wine
   echo "Backblaze found, starting the Backblaze client..."
   wine "$BZPATH" -noqiet
