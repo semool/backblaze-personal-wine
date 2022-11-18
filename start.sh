@@ -134,4 +134,5 @@ if [ -f "$BZPATH" ]; then
   configure_wine
   echo "Backblaze found, starting the Backblaze client..."
   wine "$BZPATH" -noqiet
+  sleep infinity
 fi

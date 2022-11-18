@@ -74,6 +74,9 @@ RUN rm -R /usr/share/fonts/100dpi \
           rm -R /var/cache/fontconfig && \
           ln -s /dev/null /var/cache/fontconfig
 
+# Healthcheck for Client GUI
+HEALTHCHECK CMD pidof bzbui.exe >/dev/null || exit 1
+
 # Copy the start script to the container
 COPY start.sh /start.sh
 
