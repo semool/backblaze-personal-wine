@@ -3,36 +3,80 @@ FROM i386/alpine:3.12.1
 # Not needed for Alpine and Debian Images, but for Ubuntu
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install required packages
-RUN apk --update --upgrade --no-cache add wine xvfb x11vnc openbox samba-winbind-clients ttf-dejavu tzdata
-
-# Install Languages
-ENV MUSL_LOCPATH="/usr/share/i18n/locales/musl"
-RUN apk --update --no-cache add libintl && \
-    apk --update --no-cache --virtual .build-deps add cmake make musl-dev gcc gettext-dev git && \
+RUN \
+    # Install required packages
+    apk --update --upgrade --no-cache add \
+    wine xvfb x11vnc openbox samba-winbind-clients ttf-dejavu tzdata \
+    # for noVNC
+    bash python3 procps \
+    # for language
+    libintl && \
+    #--------------
+    # Install temporary packages
+    apk --update --no-cache --virtual .build-deps add \
+    # for language
+    cmake make musl-dev gcc gettext-dev \
+    # for noVNC
+    build-base python3-dev py-pip imagemagick \
+    # for language and novnc
+    git && \
+    #--------------
+    # Install languages
     git clone https://gitlab.com/rilian-la-te/musl-locales.git && \
-    cd musl-locales && cmake -DLOCALE_PROFILE=OFF -DCMAKE_INSTALL_PREFIX:PATH=/usr . && make && make install && \
-    cd .. && rm -r musl-locales && \
-    apk del .build-deps
-
-# Install noVNC
-RUN apk --update --no-cache add bash python3 procps && \
-    apk --update --no-cache --virtual .build-deps add git build-base python3-dev py-pip && \
+    cd musl-locales && \
+    cmake -DLOCALE_PROFILE=OFF -DCMAKE_INSTALL_PREFIX:PATH=/usr . && \
+    make && \
+    make install && \
+    cd .. && \
+    rm -r musl-locales && \
+    #--------------
+    # Install noVNC
     # Not needed for this purpose and saves ~100MB # pip install --no-cache-dir numpy && \
-    git config --global advice.detachedHead false && git clone https://github.com/novnc/noVNC --branch v1.3.0 /opt/noVNC && \
+    git config --global advice.detachedHead false && \
+    git clone https://github.com/novnc/noVNC --branch v1.3.0 /opt/noVNC && \
     git clone https://github.com/novnc/websockify --branch v0.10.0 /opt/noVNC/utils/websockify && \
+    cp /opt/noVNC/vnc.html /opt/noVNC/index.html && \
+    sed -i s"/'autoconnect', false/'autoconnect', 'true'/" /opt/noVNC/app/ui.js && \
+    #--------------
+    # Replace noVNC Icons
+    wget -O logo.png https://www.backblaze.com/blog/wp-content/uploads/2017/12/backblaze_icon_transparent.png && \
+    rm /opt/noVNC/app/images/icons/novnc-*.png && \
+    convert -resize 192x192 logo.png /opt/noVNC/app/images/icons/novnc-192x192.png && \
+    convert -resize 152x152 logo.png /opt/noVNC/app/images/icons/novnc-152x152.png && \
+    convert -resize 144x144 logo.png /opt/noVNC/app/images/icons/novnc-144x144.png && \
+    convert -resize 120x120 logo.png /opt/noVNC/app/images/icons/novnc-120x120.png && \
+    convert -resize 96x96 logo.png /opt/noVNC/app/images/icons/novnc-96x96.png && \
+    convert -resize 76x76 logo.png /opt/noVNC/app/images/icons/novnc-76x76.png && \
+    convert -resize 72x72 logo.png /opt/noVNC/app/images/icons/novnc-72x72.png && \
+    convert -resize 64x64 logo.png /opt/noVNC/app/images/icons/novnc-64x64.png && \
+    convert -resize 60x60 logo.png /opt/noVNC/app/images/icons/novnc-60x60.png && \
+    convert -resize 48x48 logo.png /opt/noVNC/app/images/icons/novnc-48x48.png && \
+    convert -resize 32x32 logo.png /opt/noVNC/app/images/icons/novnc-32x32.png && \
+    convert -resize 24x24 logo.png /opt/noVNC/app/images/icons/novnc-24x24.png && \
+    convert -resize 16x16 logo.png /opt/noVNC/app/images/icons/novnc-16x16.png && \
+    rm logo.png && \
+    #--------------
+    # Cleanup
     apk del .build-deps && \
     rm -R /opt/noVNC/.git* && \
     rm -R /opt/noVNC/utils/websockify/.git* && \
-    cp /opt/noVNC/vnc.html /opt/noVNC/index.html && \
-    sed -i s"/'autoconnect', false/'autoconnect', 'true'/" /opt/noVNC/app/ui.js
+    # Create wineprefix and data dir
+    mkdir /wine && mkdir /data && \
+    #--------------
+    # Workaround for fontconfig invalid cache files spam - BUG!
+    rm -R /usr/share/fonts/100dpi \
+          /usr/share/fonts/75dpi \
+          /usr/share/fonts/cyrillic \
+          /usr/share/fonts/encodings \
+          /usr/share/fonts/misc && \
+          rm -R /var/cache/fontconfig && \
+          ln -s /dev/null /var/cache/fontconfig
 
-# Replace noVNC Favicon
-COPY icons.zip /opt/noVNC/app/images/icons/
-RUN unzip -o /opt/noVNC/app/images/icons/icons.zip -d /opt/noVNC/app/images/icons/ && rm /opt/noVNC/app/images/icons/icons.zip
+# Copy the start script to the container
+COPY start.sh /start.sh
 
-# Disable openbox right click menu
-COPY rc.xml /root/.config/openbox/rc.xml
+# Locale Path
+ENV MUSL_LOCPATH="/usr/share/i18n/locales/musl"
 
 # Set Language
 ENV LANGUAGE=en_US.UTF-8
@@ -49,8 +93,7 @@ EXPOSE 5900 6080
 # redownload Client for update/reinstall
 ENV CLIENTUPDATE=0
 
-# Configure the wine prefix location
-RUN mkdir /wine
+# Configure the wine prefix
 ENV WINEPREFIX /wine
 
 # Disable wine debug messages
@@ -62,23 +105,8 @@ ENV WINEDLLOVERRIDES mscoree,mshtml=
 # Set the wine computer name
 ENV COMPUTER_NAME bz-docker
 
-# Create the data Directory
-RUN mkdir /data
-
-# Workaround for fontconfig invalid cache files spam - BUG?!
-RUN rm -R /usr/share/fonts/100dpi \
-          /usr/share/fonts/75dpi \
-          /usr/share/fonts/cyrillic \
-          /usr/share/fonts/encodings \
-          /usr/share/fonts/misc && \
-          rm -R /var/cache/fontconfig && \
-          ln -s /dev/null /var/cache/fontconfig
-
 # Healthcheck for Client GUI
 HEALTHCHECK CMD pidof bzbui.exe >/dev/null || exit 1
-
-# Copy the start script to the container
-COPY start.sh /start.sh
 
 # Set the start script as entrypoint
 ENTRYPOINT ./start.sh
