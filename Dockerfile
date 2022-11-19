@@ -17,25 +17,26 @@ RUN \
     # for language
     cmake make musl-dev gcc gettext-dev \
     # for noVNC
-    build-base python3-dev py-pip imagemagick \
+    imagemagick \
+    # for numpy
+    #build-base python3-dev py-pip \
     # for language and novnc
     git && \
     #--------------
-    # Install languages
+    # Install locales
     git clone https://gitlab.com/rilian-la-te/musl-locales.git && \
     cd musl-locales && \
     cmake -DLOCALE_PROFILE=OFF -DCMAKE_INSTALL_PREFIX:PATH=/usr . && \
     make && \
     make install && \
     cd .. && \
-    rm -r musl-locales && \
     #--------------
     # Install noVNC
     # Not needed for this purpose and saves ~100MB # pip install --no-cache-dir numpy && \
     git config --global advice.detachedHead false && \
     git clone https://github.com/novnc/noVNC --branch v1.3.0 /opt/noVNC && \
     git clone https://github.com/novnc/websockify --branch v0.10.0 /opt/noVNC/utils/websockify && \
-    cp /opt/noVNC/vnc.html /opt/noVNC/index.html && \
+    ln -s /opt/noVNC/vnc.html /opt/noVNC/index.html && \
     sed -i s"/'autoconnect', false/'autoconnect', 'true'/" /opt/noVNC/app/ui.js && \
     #--------------
     # Replace noVNC Icons
@@ -58,6 +59,7 @@ RUN \
     #--------------
     # Cleanup
     apk del .build-deps && \
+    rm -R musl-locales && \
     rm -R /opt/noVNC/.git* && \
     rm -R /opt/noVNC/utils/websockify/.git* && \
     # Create wineprefix and data dir
