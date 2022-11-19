@@ -45,7 +45,7 @@ function configure_wine {
     echo "Error: computer name cannot be longer than 15 characters"
     exit 1
   fi
-  echo "- Setting the wine computer name: $COMPUTER_NAME"
+  echo "- Setting Computer Name: $COMPUTER_NAME"
   wine reg add "HKCU\\SOFTWARE\\Wine\\Network\\" /v UseDnsComputerName /f /d N &>/dev/null
   wine reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ComputerName" /v ComputerName /f /d $COMPUTER_NAME &>/dev/null
   wine reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ActiveComputerName" /v ComputerName /f /d $COMPUTER_NAME &>/dev/null
@@ -56,8 +56,8 @@ function configure_wine {
   wine reg add "HKCU\\Control Panel\\Desktop\\" /v FontSmoothingGamma /t REG_DWORD /f /d 578 &>/dev/null
   wine reg add "HKCU\\Control Panel\\Desktop\\" /v FontSmoothingOrientation /t REG_DWORD /f /d 1 &>/dev/null
   wine reg add "HKCU\\Control Panel\\Desktop\\" /v FontSmoothingType /t REG_DWORD /f /d 2 &>/dev/null
-  echo "- Setting WineDbg BreakOnFirstChance 0 - let applications handle exceptions themselves"
-  wine reg add "HKCU\\SOFTWARE\\Wine\\WineDbg\\" /v BreakOnFirstChance /t REG_DWORD /f /d 0 &>/dev/null
+  echo "- Disable the Debugger"
+  wine reg delete "HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AeDebug" /f &>/dev/null
   echo "************************************"
 }
 
