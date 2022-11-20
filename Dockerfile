@@ -46,6 +46,9 @@ RUN \
     for i in $ICONSIZE; do convert -resize $i logo.png /opt/noVNC/app/images/icons/novnc-$i.png; done && \
     rm logo.png && \
     #--------------
+    # Disable openbox right click menu - get rc.xml direct from Github
+    wget -O /root/.config/openbox/rc.xml https://raw.githubusercontent.com/semool/backblaze-personal-wine/x86-alpine3.13.12-wine4.0.3/rc.xml && \
+    #--------------
     # get start.sh direct from Github
     wget https://raw.githubusercontent.com/semool/backblaze-personal-wine/x86-alpine3.13.12-wine4.0.3/start.sh && \
     chmod 755 start.sh && \
@@ -66,6 +69,9 @@ RUN \
           /usr/share/fonts/misc \
           /var/cache/fontconfig && \
     ln -s /dev/null /var/cache/fontconfig
+
+# Disable openbox right click menu
+#COPY rc.xml /root/.config/openbox/rc.xml
 
 # Copy the start script to the container
 #COPY start.sh /start.sh
