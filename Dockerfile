@@ -1,4 +1,4 @@
-FROM i386/alpine:3.12.1
+FROM i386/alpine:3.13.12
 
 # Not needed for Alpine and Debian Images, but for Ubuntu
 ENV DEBIAN_FRONTEND=noninteractive
@@ -47,7 +47,7 @@ RUN \
     rm logo.png && \
     #--------------
     # get start.sh direct from Github
-    wget https://raw.githubusercontent.com/semool/backblaze-personal-wine/x86-alpine3.12.1-wine4.0.3/start.sh && \
+    wget https://raw.githubusercontent.com/semool/backblaze-personal-wine/x86-alpine3.13.12-wine4.0.3/start.sh && \
     chmod 755 start.sh && \
     #--------------
     # Cleanup
