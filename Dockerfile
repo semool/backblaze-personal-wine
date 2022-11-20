@@ -47,7 +47,7 @@ RUN \
     rm logo.png && \
     #--------------
     # Disable openbox right click menu - get rc.xml direct from Github
-    mkdir /root/.config/ /root/.config/openbox && \
+    mkdir -p /root/.config/openbox && \
     wget -O /root/.config/openbox/rc.xml https://raw.githubusercontent.com/semool/backblaze-personal-wine/x86-alpine3.13.12-wine4.0.3/rc.xml && \
     #--------------
     # get start.sh direct from Github
