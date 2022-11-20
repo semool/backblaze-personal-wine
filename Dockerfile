@@ -42,40 +42,32 @@ RUN \
     # Replace noVNC Icons
     wget -O logo.png https://www.backblaze.com/blog/wp-content/uploads/2017/12/backblaze_icon_transparent.png && \
     rm /opt/noVNC/app/images/icons/novnc-*.png && \
-    convert -resize 192x192 logo.png /opt/noVNC/app/images/icons/novnc-192x192.png && \
-    convert -resize 152x152 logo.png /opt/noVNC/app/images/icons/novnc-152x152.png && \
-    convert -resize 144x144 logo.png /opt/noVNC/app/images/icons/novnc-144x144.png && \
-    convert -resize 120x120 logo.png /opt/noVNC/app/images/icons/novnc-120x120.png && \
-    convert -resize 96x96 logo.png /opt/noVNC/app/images/icons/novnc-96x96.png && \
-    convert -resize 76x76 logo.png /opt/noVNC/app/images/icons/novnc-76x76.png && \
-    convert -resize 72x72 logo.png /opt/noVNC/app/images/icons/novnc-72x72.png && \
-    convert -resize 64x64 logo.png /opt/noVNC/app/images/icons/novnc-64x64.png && \
-    convert -resize 60x60 logo.png /opt/noVNC/app/images/icons/novnc-60x60.png && \
-    convert -resize 48x48 logo.png /opt/noVNC/app/images/icons/novnc-48x48.png && \
-    convert -resize 32x32 logo.png /opt/noVNC/app/images/icons/novnc-32x32.png && \
-    convert -resize 24x24 logo.png /opt/noVNC/app/images/icons/novnc-24x24.png && \
-    convert -resize 16x16 logo.png /opt/noVNC/app/images/icons/novnc-16x16.png && \
+    ICONSIZE="192x192 152x152 144x144 120x120 96x96 76x76 72x72 64x64 60x60 48x48 32x32 24x24 16x16" && \
+    for i in $ICONSIZE; do convert -resize $i logo.png /opt/noVNC/app/images/icons/novnc-$i.png; done && \
     rm logo.png && \
     #--------------
+    # get start.sh direct from Github
+    wget https://raw.githubusercontent.com/semool/backblaze-personal-wine/x86-alpine3.12.1-wine4.0.3/start.sh && \
+    chmod 755 start.sh && \
     # Cleanup
     apk del .build-deps && \
-    rm -R musl-locales && \
-    rm -R /opt/noVNC/.git* && \
-    rm -R /opt/noVNC/utils/websockify/.git* && \
+    rm -R musl-locales \
+          /opt/noVNC/.git* \
+          /opt/noVNC/utils/websockify/.git* && \
     # Create wineprefix and data dir
-    mkdir /wine && mkdir /data && \
+    mkdir /wine /data && \
     #--------------
     # Workaround for fontconfig invalid cache files spam - BUG!
     rm -R /usr/share/fonts/100dpi \
           /usr/share/fonts/75dpi \
           /usr/share/fonts/cyrillic \
           /usr/share/fonts/encodings \
-          /usr/share/fonts/misc && \
-          rm -R /var/cache/fontconfig && \
-          ln -s /dev/null /var/cache/fontconfig
+          /usr/share/fonts/misc \
+          /var/cache/fontconfig && \
+    ln -s /dev/null /var/cache/fontconfig
 
 # Copy the start script to the container
-COPY start.sh /start.sh
+#COPY start.sh /start.sh
 
 # Locale Path
 ENV MUSL_LOCPATH="/usr/share/i18n/locales/musl"
