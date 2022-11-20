@@ -1,8 +1,17 @@
-#!/bin/sh
+#!/bin/bash
 
-echo "Setting x86 Path for Backblaze Client"
-BZPATH="$WINEPREFIX/drive_c/Program Files/Backblaze/bzbui.exe"
-BZPATHROOT="$WINEPREFIX/drive_c/Program Files/Backblaze"
+GETARCH=`getconf LONG_BIT`
+echo "Detected Arch: $GETARCH bit"
+echo "************************************"
+
+echo "Setting $GETARCH bit Path for Backblaze Client"
+if [ "$GETARCH" == "32" ]; then
+   BZPATH="$WINEPREFIX/drive_c/Program Files/Backblaze/bzbui.exe"
+   BZPATHROOT="$WINEPREFIX/drive_c/Program Files/Backblaze"
+fi
+if [ "$GETARCH" == "64" ]; then
+   BZPATH="$WINEPREFIX/drive_c/Program Files (x86)/Backblaze/bzbui.exe"
+fi
 echo "************************************"
 
 if [ "$CLIENTUPDATE" != "0" ]; then
@@ -17,7 +26,15 @@ date
 echo "************************************"
 
 echo "Setting Language to: $LANGUAGE"
-export LC_ALL=$LANGUAGE
+if [ "$GETARCH" == "32" ]; then
+   export LC_ALL=$LANGUAGE
+fi
+if [ "$GETARCH" == "64" ]; then
+   LANGSHORT1=`echo $LANGUAGE | cut -d "." -f1`
+   LANGSHORT2=`echo $LANGUAGE | cut -d "." -f2 | tr '[:upper:]' '[:lower:]' | sed s/-//`
+   localedef -i $LANGSHORT1 -c -f UTF-8 -A /usr/share/locale/locale.alias $LANGUAGE
+   export LANG=$LANGSHORT1.$LANGSHORT2
+fi
 echo "************************************"
 
 echo "Starting the VNC Server on Port: 5900"
@@ -84,12 +101,12 @@ function rename_x64 {
 }
 
 function install_backblaze {
-  echo "Backblaze installer started, please go through the graphical setup by logging onto the containers [no]VNC server"
+  echo "Backblaze installer started, please go through the graphical setup by logging onto the containers (no)VNC server"
   wine $WINEPREFIX/drive_c/install_backblaze.exe
   echo "************************************"
   echo "Installation finished or aborted! Lets check..."
   echo "************************************"
-  rename_x64
+  if [ "$GETARCH" == "32" ]; then rename_x64; fi
   echo "Trying to start the Backblaze client..."
   wineserver -k
 }
