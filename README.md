@@ -12,7 +12,7 @@ Please note, Linux specific file attributes (like ownership, acls or permissions
 * Add Language Support
 * Adding user configurable LANGUAGE and TIMEZONE. Defaults are 'en_US.UTF-8' and 'Etc/UTC'
 * Disable openbox right click menu (not needed)
-* Install a dark Theme for Openbox
+* Install a dark [Theme (Afterpiece)](https://github.com/terroo/openbox-themes/tree/main/Afterpiece) for Openbox
 * Add required Fonts for Openbox Font Issue
 * Adding Font [segoe-ui-linux](https://github.com/mrbvrz/segoe-ui-linux) for the Gui
 * Adding noVNC Webinterface
