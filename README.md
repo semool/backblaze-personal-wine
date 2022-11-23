@@ -15,7 +15,7 @@ Please note, Linux specific file attributes (like ownership, acls or permissions
 * Install a dark [Theme (Afterpiece)](https://github.com/terroo/openbox-themes/tree/main/Afterpiece) for Openbox
 * Add required Fonts for Openbox Font Issue
 * Adding Font [segoe-ui-linux](https://github.com/mrbvrz/segoe-ui-linux) for the Gui
-* Adding noVNC Webinterface
+* Adding [noVNC](https://github.com/novnc/noVNC) Webinterface
 * Adding new noVNC Icons
 * Adding ENV to initiate a Client Redownload/Update
 * Changing Wine DPI and activate Font Smoothing
