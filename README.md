@@ -14,7 +14,7 @@ Please note, Linux specific file attributes (like ownership, acls or permissions
 * Disable openbox right click menu (not needed)
 * Install a dark Theme for Openbox
 * Add required Fonts for Openbox Font Issue
-* Adding Font segoe-ui-linux for Gui
+* Adding Font [segoe-ui-linux](https://github.com/mrbvrz/segoe-ui-linux) for the Gui
 * Adding noVNC Webinterface
 * Adding new noVNC Icons
 * Adding ENV to initiate a Client Redownload/Update
