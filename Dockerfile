@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN \
     # Install required packages
     apk --update --upgrade --no-cache add \
-    wine xvfb x11vnc openbox samba-winbind-clients ttf-dejavu tzdata \
+    wine xvfb x11vnc openbox samba-winbind-clients tzdata \
     # for noVNC
     bash python3 procps \
     # for language
@@ -22,6 +22,21 @@ RUN \
     #build-base python3-dev py-pip \
     # for language and novnc
     git && \
+    #--------------
+    # Install segoe-ui-linux Font instead of ttf-dejavu
+    DEST_DIR="/usr/share/fonts/Microsoft/TrueType/Segoe UI/" && \
+    mkdir -p "$DEST_DIR" && \
+    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeui.ttf?raw=true -O "$DEST_DIR"/segoeui.ttf && \
+    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuib.ttf?raw=true -O "$DEST_DIR"/segoeuib.ttf && \
+    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuii.ttf?raw=true -O "$DEST_DIR"/segoeuii.ttf && \
+    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuiz.ttf?raw=true -O "$DEST_DIR"/segoeuiz.ttf && \
+    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuil.ttf?raw=true -O "$DEST_DIR"/segoeuil.ttf && \
+    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/seguili.ttf?raw=true -O "$DEST_DIR"/seguili.ttf && \
+    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuisl.ttf?raw=true -O "$DEST_DIR"/segoeuisl.ttf && \
+    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/seguisli.ttf?raw=true -O "$DEST_DIR"/seguisli.ttf && \
+    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/seguisb.ttf?raw=true -O "$DEST_DIR"/seguisb.ttf && \
+    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/seguisbi.ttf?raw=true -O "$DEST_DIR"/seguisbi.ttf && \
+    fc-cache -f "$DEST_DIR" && \
     #--------------
     # Install locales
     git clone https://gitlab.com/rilian-la-te/musl-locales.git && \

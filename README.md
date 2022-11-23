@@ -6,7 +6,7 @@ Then look no further, this container automatically creates a tiny Wine prefix th
 Please note, Linux specific file attributes (like ownership, acls or permissions) will not be backed up;
 
 ## Modifications by semool
-* The Complete Image will have only ~361MB!
+* The Complete Image will have only ~348MB!
 * Set the right Alpine version (3.13.12)
 * Fix the Wine Install (4.0.3)
 * Add Language Support
