@@ -38,6 +38,13 @@ RUN \
     wget https://github.com/mrbvrz/segoe-ui/raw/master/font/seguisbi.ttf?raw=true -O "$DEST_DIR"/seguisbi.ttf && \
     fc-cache -f "$DEST_DIR" && \
     #--------------
+    # Install openbox theme
+    git clone https://github.com/terroo/openbox-themes && \
+    mkdir -p /root/.themes && \
+    cd openbox-themes && \
+    mv Afterpiece /root/.themes/ && \
+    cd .. && \
+    #--------------
     # Install locales
     git clone https://gitlab.com/rilian-la-te/musl-locales.git && \
     cd musl-locales && \
@@ -61,7 +68,7 @@ RUN \
     for i in $ICONSIZE; do convert -resize $i logo.png /opt/noVNC/app/images/icons/novnc-$i.png; done && \
     rm logo.png && \
     #--------------
-    # Disable openbox right click menu - get rc.xml direct from Github
+    # Disable openbox right click menu - Set openbox theme - get rc.xml direct from Github
     mkdir -p /root/.config/openbox && \
     wget -O /root/.config/openbox/rc.xml https://raw.githubusercontent.com/semool/backblaze-personal-wine/x86-alpine3.13.12-wine4.0.3/rc.xml && \
     #--------------
@@ -72,6 +79,7 @@ RUN \
     # Cleanup
     apk del .build-deps && \
     rm -R musl-locales \
+          openbox-themes \
           /opt/noVNC/.git* \
           /opt/noVNC/utils/websockify/.git* && \
     # Create wineprefix and data dir
