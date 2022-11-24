@@ -120,7 +120,7 @@ RUN \
     sed -i s"/<action name=\"ShowMenu\"><menu>root-menu<\/menu><\/action>//" /root/.config/openbox/rc.xml && \
     #--------------
     # get start.sh direct from Github
-    wget https://raw.githubusercontent.com/semool/backblaze-personal-wine/x86-alpine3.13.12-wine4.0.3/start.sh && \
+    wget https://raw.githubusercontent.com/semool/backblaze-personal-wine/master/start.sh && \
     chmod 755 start.sh && \
     #--------------
     # Create wineprefix and data dir
