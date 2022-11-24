@@ -74,7 +74,7 @@ RUN \
     sed -i s"/<name>Clearlooks<\/name>/<name>Afterpiece<\/name>/" /root/.config/openbox/rc.xml && \
     #--------------
     # Set openbox Titlebar Font Size
-    sed -i s"/<size>8<\/size>/<size>10<\/size>/"  /root/.config/openbox/rc.xml && \
+    sed -i s"/<size>8<\/size>/<size>10<\/size>/" /root/.config/openbox/rc.xml && \
     #--------------
     # Disable openbox right click root menu
     sed -i s"/<action name=\"ShowMenu\"><menu>root-menu<\/menu><\/action>//" /root/.config/openbox/rc.xml && \
