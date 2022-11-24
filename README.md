@@ -1,6 +1,8 @@
 # backblaze-personal-wine-x86
 
 ## Infos
+The original x86 Image comes from [tom300z](https://github.com/tom300z/backblaze-personal-wine)
+
 Looking for a (relatively) easy way to backup your personal linux system via Backblaze Personal unlimited? 
 Then look no further, this container automatically creates a tiny Wine prefix that runs the Backblaze personal client to backup any mounted directory in your linux filesystem.
 Please note, Linux specific file attributes (like ownership, acls or permissions) will not be backed up;
@@ -35,7 +37,7 @@ docker run -d \
     -p 6080:6080 \
     -e LANGUAGE=de_DE.UTF-8 \
     -e TZ=Europe/Berlin \
-    -e CLIENTUPDATE=0 \ # <- Set this to 1 for Client Update/Reinstall
+    -e CLIENTUPDATE=0 \ # <- Set this to 1 (2 for Beta Version) for Client Update/Reinstall
     -v backblaze_data:/wine \ #<- This can be a Docker Volume
     -v /mnt/backblaze-temp:/data \ #<- This must be a Folder that is big enough to save the bigest file from your Backup (look at 'Data Dir Tips')
     -v /mnt/backupfolder1:/data/backupfolder1 \ #<- A Folder that should be Backuped
@@ -101,6 +103,7 @@ Backblaze is now configured to automatically backup your linux files,  to check 
 
 ### Step 4: Client Update
 To reinstall/update the Client start the Container with '-e CLIENTUPDATE=1'
+With '-e CLIENTUPDATE=2' the latest Beta Version will be downloaded.
 The old Installer will be renamed and then the actual one will be downloaded.
 After this the Installation will start. Go to the VNC Server to complete. The Client will start automaticaly after this.
 When you restart the complete Container set 'CLIENTUPDATE' back to 0.

@@ -17,6 +17,10 @@ echo "************************************"
 if [ "$CLIENTUPDATE" != "0" ]; then
    echo "Client Update Mode ON!"
    touch $WINEPREFIX/drive_c/.CLIENTUPDATE
+   if [ "$CLIENTUPDATE" == "2" ]; then
+      echo "Client Update Mode for BETA VERSION!!"
+      touch $WINEPREFIX/drive_c/.CLIENTUPDATEBETA
+   fi
    echo "************************************"
 fi
 
@@ -136,11 +140,17 @@ if [ -e $WINEPREFIX/drive_c/.CLIENTUPDATE ]; then
     mv -f $WINEPREFIX/drive_c/install_backblaze.exe $WINEPREFIX/drive_c/install_backblaze.exe_$DATE
   fi
   echo "************************************"
-  echo "Downloading the Backblaze personal installer..."
-  wget https://www.backblaze.com/win32/install_backblaze.exe -P $WINEPREFIX/drive_c/
+  if [ -e $WINEPREFIX/drive_c/.CLIENTUPDATEBETA ]; then
+    echo "Downloading the Backblaze personal BETA installer..."
+    wget https://f000.backblazeb2.com/file/backblazefiles/install_backblaze.exe -P $WINEPREFIX/drive_c/
+  else
+    echo "Downloading the Backblaze personal installer..."
+    wget https://www.backblaze.com/win32/install_backblaze.exe -P $WINEPREFIX/drive_c/
+  fi
   sleep 2
   CLIENTUPDATE=0
   rm -f $WINEPREFIX/drive_c/.CLIENTUPDATE
+  if [ -e $WINEPREFIX/drive_c/.CLIENTUPDATEBETA ]; then rm -f $WINEPREFIX/drive_c/.CLIENTUPDATEBETA; fi
   echo "************************************"
   install_backblaze
 fi
