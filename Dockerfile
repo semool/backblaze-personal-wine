@@ -7,8 +7,10 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN \
     # Set arch version
-    if [ "$BASEIMAGE" = "i386/alpine:3.13.12" ]; then ARCH="32"; fi && \
-    if [ "$BASEIMAGE" = "amd64/debian:buster-slim" ]; then ARCH="64"; fi && \
+    if [ "$BASEIMAGE" = "i386/alpine:3.13.12" ]; then ARCH="32"; \
+    elif [ "$BASEIMAGE" = "amd64/debian:buster-slim" ]; then ARCH="64"; else \
+    echo -e "\033[0;31m!!!!!WARNING!!!!! BASEIMAGE must be 'i386/alpine:3.13.12' or 'amd64/debian:buster-slim'! EXIT BUILD !!!!!WARNING!!!!!\033[0m" && exit 1; \
+    fi && \
     #--------------
     # Install Packages x86
     if [ "$ARCH" = "32" ]; then \

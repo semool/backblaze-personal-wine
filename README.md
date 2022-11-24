@@ -3,7 +3,7 @@
 ## Infos
 Looking for a (relatively) easy way to backup your personal linux system via Backblaze Personal unlimited? 
 Then look no further, this container automatically creates a tiny Wine prefix that runs the Backblaze personal client to backup any mounted directory in your linux filesystem.
-Please note, Linux specific file attributes (like ownership, acls or permissions) will not be backed up;
+Please note, Linux specific file attributes (like ownership, acls or permissions) will not be backed up.
 
 * The original x86 Image comes from [tom300z](https://github.com/tom300z/backblaze-personal-wine)
 * Multi Dockerfile for x86 and x64
