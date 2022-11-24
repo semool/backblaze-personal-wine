@@ -38,13 +38,6 @@ RUN \
     wget https://github.com/mrbvrz/segoe-ui/raw/master/font/seguisbi.ttf?raw=true -O "$DEST_DIR"/seguisbi.ttf && \
     fc-cache -f "$DEST_DIR" && \
     #--------------
-    # Install openbox theme
-    git clone https://github.com/terroo/openbox-themes && \
-    mkdir -p /root/.themes && \
-    cd openbox-themes && \
-    mv Afterpiece /root/.themes/ && \
-    cd .. && \
-    #--------------
     # Install locales
     git clone https://gitlab.com/rilian-la-te/musl-locales.git && \
     cd musl-locales && \
@@ -68,9 +61,23 @@ RUN \
     for i in $ICONSIZE; do convert -resize $i logo.png /opt/noVNC/app/images/icons/novnc-$i.png; done && \
     rm logo.png && \
     #--------------
-    # Disable openbox right click menu - Set openbox theme - get rc.xml direct from Github
+    # Install openbox theme
+    git clone https://github.com/terroo/openbox-themes && \
+    mkdir -p /root/.themes && \
+    cd openbox-themes && \
+    mv Afterpiece /root/.themes/ && \
+    cd .. && \
+    #--------------
+    # Set openbox theme
     mkdir -p /root/.config/openbox && \
-    wget -O /root/.config/openbox/rc.xml https://raw.githubusercontent.com/semool/backblaze-personal-wine/x86-alpine3.13.12-wine4.0.3/rc.xml && \
+    cp /etc/xdg/openbox/rc.xml /root/.config/openbox/rc.xml && \
+    sed -i s"/<name>Clearlooks<\/name>/<name>Afterpiece<\/name>/" /root/.config/openbox/rc.xml && \
+    #--------------
+    # Set openbox Titlebar Font Size
+    sed -i s"/<size>8<\/size>/<size>10<\/size>/"  /root/.config/openbox/rc.xml && \
+    #--------------
+    # Disable openbox right click root menu
+    sed -i s"/<action name=\"ShowMenu\"><menu>root-menu<\/menu><\/action>//" /root/.config/openbox/rc.xml && \
     #--------------
     # get start.sh direct from Github
     wget https://raw.githubusercontent.com/semool/backblaze-personal-wine/x86-alpine3.13.12-wine4.0.3/start.sh && \
@@ -93,9 +100,6 @@ RUN \
           /usr/share/fonts/misc \
           /var/cache/fontconfig && \
     ln -s /dev/null /var/cache/fontconfig
-
-# Disable openbox right click menu
-#COPY rc.xml /root/.config/openbox/rc.xml
 
 # Copy the start script to the container
 #COPY start.sh /start.sh
