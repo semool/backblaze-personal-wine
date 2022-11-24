@@ -1,27 +1,65 @@
-FROM i386/alpine:3.13.12
+ARG BASEIMAGE="i386/alpine:3.13.12"
+FROM $BASEIMAGE
+ARG BASEIMAGE
 
 # Not needed for Alpine and Debian Images, but for Ubuntu
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN \
-    # Install required packages
-    apk --update --upgrade --no-cache add \
-    wine xvfb x11vnc openbox samba-winbind-clients tzdata \
-    # for noVNC
-    bash python3 procps \
-    # for language
-    libintl && \
+    # Set arch version
+    if [ "$BASEIMAGE" = "i386/alpine:3.13.12" ]; then ARCH="32"; fi && \
+    if [ "$BASEIMAGE" = "amd64/debian:buster-slim" ]; then ARCH="64"; fi && \
     #--------------
-    # Install temporary packages
-    apk --update --no-cache --virtual .build-deps add \
-    # for language
-    cmake make musl-dev gcc gettext-dev \
-    # for noVNC
-    imagemagick \
-    # for numpy
-    #build-base python3-dev py-pip \
-    # for language and novnc
-    git && \
+    # Install Packages x86
+    if [ "$ARCH" = "32" ]; then \
+       # Install required packages
+       apk --update --upgrade --no-cache add \
+       wine xvfb x11vnc openbox samba-winbind-clients tzdata \
+       # for noVNC
+       bash python3 procps \
+       # for language
+       libintl && \
+       #--------------
+       # Install temporary packages
+       apk --update --no-cache --virtual .build-deps add \
+       # for language
+       cmake make musl-dev gcc gettext-dev \
+       # for noVNC
+       imagemagick \
+       # for numpy
+       #build-base python3-dev py-pip \
+       # for language and novnc
+       git \
+       #--------------
+       && \
+       # Install locales
+       git clone https://gitlab.com/rilian-la-te/musl-locales.git && \
+       cd musl-locales && \
+       cmake -DLOCALE_PROFILE=OFF -DCMAKE_INSTALL_PREFIX:PATH=/usr . && \
+       make && \
+       make install && \
+       cd .. \
+       #--------------
+       ; \
+    fi && \
+    #--------------
+    # Install Packages x64
+    if [ "$ARCH" = "64" ]; then \
+       # Add i386
+       dpkg --add-architecture i386 && \
+       #--------------
+       # Install required packages
+       apt-get update && \
+       apt-get upgrade -y && \
+       apt-get --no-install-recommends install \
+       wine wine32 wine64 xvfb x11vnc openbox wget locales tzdata ca-certificates \
+       # for noVNC
+       python3 procps imagemagick git \
+       # for numpy
+       #build-base python3-dev py-pip \
+       -y \
+       ; \
+    fi && \
     #--------------
     # Install segoe-ui-linux Font instead of ttf-dejavu
     DEST_DIR="/usr/share/fonts/Microsoft/TrueType/Segoe UI/" && \
@@ -37,14 +75,6 @@ RUN \
     wget https://github.com/mrbvrz/segoe-ui/raw/master/font/seguisb.ttf?raw=true -O "$DEST_DIR"/seguisb.ttf && \
     wget https://github.com/mrbvrz/segoe-ui/raw/master/font/seguisbi.ttf?raw=true -O "$DEST_DIR"/seguisbi.ttf && \
     fc-cache -f "$DEST_DIR" && \
-    #--------------
-    # Install locales
-    git clone https://gitlab.com/rilian-la-te/musl-locales.git && \
-    cd musl-locales && \
-    cmake -DLOCALE_PROFILE=OFF -DCMAKE_INSTALL_PREFIX:PATH=/usr . && \
-    make && \
-    make install && \
-    cd .. && \
     #--------------
     # Install noVNC
     # Not needed for this purpose and saves ~100MB # pip install --no-cache-dir numpy && \
@@ -68,9 +98,17 @@ RUN \
     mv Afterpiece /root/.themes/ && \
     cd .. && \
     #--------------
-    # Set openbox theme
+    # Copy openbox config
     mkdir -p /root/.config/openbox && \
     cp /etc/xdg/openbox/rc.xml /root/.config/openbox/rc.xml && \
+    #--------------
+    # Disable non existent Debian Menu
+    if [ "$ARCH" = "64" ]; then \
+       sed -i s"/<file>\/var\/lib\/openbox\/debian-menu.xml<\/file>//" /root/.config/openbox/rc.xml \
+       ; \
+    fi && \
+    #--------------
+    # Set openbox theme
     sed -i s"/<name>Clearlooks<\/name>/<name>Afterpiece<\/name>/" /root/.config/openbox/rc.xml && \
     #--------------
     # Set openbox Titlebar Font Size
@@ -83,29 +121,45 @@ RUN \
     wget https://raw.githubusercontent.com/semool/backblaze-personal-wine/x86-alpine3.13.12-wine4.0.3/start.sh && \
     chmod 755 start.sh && \
     #--------------
-    # Cleanup
-    apk del .build-deps && \
-    rm -R musl-locales \
-          openbox-themes \
-          /opt/noVNC/.git* \
-          /opt/noVNC/utils/websockify/.git* && \
     # Create wineprefix and data dir
     mkdir /wine /data && \
     #--------------
-    # Workaround for fontconfig invalid cache files spam - BUG!
-    rm -R /usr/share/fonts/100dpi \
-          /usr/share/fonts/75dpi \
-          /usr/share/fonts/cyrillic \
-          /usr/share/fonts/encodings \
-          /usr/share/fonts/misc \
-          /var/cache/fontconfig && \
-    ln -s /dev/null /var/cache/fontconfig
+    # Cleanup x86/x64
+    rm -R openbox-themes \
+          /opt/noVNC/.git* \
+          /opt/noVNC/utils/websockify/.git* && \
+    #--------------
+    # Cleanup x86
+    if [ "$ARCH" = "32" ]; then \
+       apk del .build-deps && \
+       rm -R musl-locales && \
+       # Workaround for fontconfig invalid cache files spam - BUG!
+       rm -R /usr/share/fonts/100dpi \
+             /usr/share/fonts/75dpi \
+             /usr/share/fonts/cyrillic \
+             /usr/share/fonts/encodings \
+             /usr/share/fonts/misc \
+             /var/cache/fontconfig && \
+       ln -s /dev/null /var/cache/fontconfig \
+       ; \
+    fi && \
+    #--------------
+    # Cleanup x64
+    if [ "$ARCH" = "64" ]; then \
+       rm -rf /var/lib/apt/lists/* \
+              /usr/share/doc && \
+       apt-get purge git imagemagick \
+       -y && \
+       apt-get autoremove -y && \
+       apt-get clean && \
+       rm -rf /var/lib/apt/lists/* && \
+       dpkg -r --force-depends fonts-dejavu-core \
+       ; \
+    fi
+    #--------------
 
 # Copy the start script to the container
 #COPY start.sh /start.sh
-
-# Locale Path
-ENV MUSL_LOCPATH="/usr/share/i18n/locales/musl"
 
 # Set Language
 ENV LANGUAGE=en_US.UTF-8

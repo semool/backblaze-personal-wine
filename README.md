@@ -1,29 +1,37 @@
-# backblaze-personal-wine-x86
+# backblaze-personal-wine
 
 ## Infos
-The original x86 Image comes from [tom300z](https://github.com/tom300z/backblaze-personal-wine)
-
 Looking for a (relatively) easy way to backup your personal linux system via Backblaze Personal unlimited? 
 Then look no further, this container automatically creates a tiny Wine prefix that runs the Backblaze personal client to backup any mounted directory in your linux filesystem.
 Please note, Linux specific file attributes (like ownership, acls or permissions) will not be backed up;
 
-## Modifications by semool
-* The Complete Image will have only ~348MB!
-* Set the right Alpine version (3.13.12)
-* Fix the Wine Install (4.0.3)
-* Add Language Support
+* The original x86 Image comes from [tom300z](https://github.com/tom300z/backblaze-personal-wine)
+* Multi Dockerfile for x86 and x64
+* (x86) Alpine version 3.13.12, Wine 4.0.3, Image Size ~348MB!
+* (x64) Debian 10 Buster, Wine 4.0.2, Image Size ~845MB!
 * Adding user configurable LANGUAGE and TIMEZONE. Defaults are 'en_US.UTF-8' and 'Etc/UTC'
 * Disable openbox right click root menu (not needed)
 * Install a dark [Theme (Afterpiece)](https://github.com/terroo/openbox-themes/tree/main/Afterpiece) for Openbox
-* Add required Fonts for Openbox Font Issue
-* Adding Font [segoe-ui-linux](https://github.com/mrbvrz/segoe-ui-linux) for the Gui
+* Adding Font [segoe-ui-linux](https://github.com/mrbvrz/segoe-ui-linux) for the Gui instead of ttf-dejavu
 * Adding [noVNC](https://github.com/novnc/noVNC) Webinterface
-* Adding new noVNC Icons
+* Adding Backblaze noVNC Icons
 * Adding ENV to initiate a Client Redownload/Update
 * Changing Wine DPI and activate Font Smoothing
-* Disable Wine Debugger
-* Workaround for fontconfig cache file spam in /var/cache/fontconfig
-* After Backblaze Client Installation renaming ALL x64 Binaries while this is a i386 only Container. Without renaming them the Client try continusly starting them and wine will go in Debug Mode = High CPU Load! When a Message Pops up with Client is not installed correctly ignore it and click in the main Client Window to hide the Warning in the background. Client will run fine!
+* (x86) Disable Wine Debugger
+* (x86) Workaround for fontconfig cache file spam in /var/cache/fontconfig
+
+## The x64 Image
+It runs fine. But i prefer the x86 one. Its smaller. The only x64 Binaries from the Client are the list and transfer ones. I haven't noticed any benefits from the x64.
+
+## Container Build Instructions
+* To build the x86 Version:
+```
+docker build -t backblaze-personal-wine:x86 .
+```
+* To build the x64 Version:
+```
+docker build -t backblaze-personal-wine:x64 --build-arg BASEIMAGE="amd64/debian:buster-slim" .
+```
 
 ## Docker run example
 <details>
@@ -44,8 +52,13 @@ docker run -d \
     -v /mnt/backupfolder2:/data/backupfolder2 \ #<- A Folder that should be Backuped
     --name=backblaze \
     --restart=always \
-    backblaze-personal-wine:x86
+    backblaze-personal-wine:x86 # <- or x64
 ```
+</details><br/>
+
+## VNC Server and Security
+<details>
+  <summary>Click to expand!</summary>
 
 ### Connecting to the VNC Server
 To go through the setup process you must connect to the integrated vnc server via a client like RealVNC Client.
@@ -80,9 +93,14 @@ Now you can mount all your Folders for Backup inside. you can remove or add Fold
 When starting the container for the first time, it will automatically initialize a new Wine prefix and download & run the backblaze installer.
 
 When you only see a black screen once you are connected press alt-tab to activate the installer window.
-The installer might look a bit weird (all white) at the very beginning. Just enter your backblaze account email into the white box and hit enter, then you should see the rest of the ui.
-Or you can move the Window up/down a little bit, that fixed the view.
-Enter your password and hit "Install", the installer will start scanning your drive.
+
+Eventually the installer might look a bit weird (all white) at the very beginning. Just enter your backblaze account email into the white box and hit enter, then you should see the rest of the ui.
+Or you can move the Window around a little bit, that fixed the view.
+
+Then enter your password and hit "Install", the installer will start scanning your drive.
+
+* For x86 Image: After Backblaze Client Installation ALL x64 Binaries are get renamed while this is a i386 only Container. Without renaming them the Client try continusly starting them and wine will go in Debug Mode = High CPU Load! When a Message Pops up with Client is not installed correctly ignore it and click in the main Client Window to hide the Warning in the background. Client will run fine!
+* For X64 Image: When you become a Popup at Client Start 'ERR_NotificationDialog_bad_bzdata_permissions', ignore it and place it behind the Main Client Window. Eventually this is a Message that says you to enable Windows Location Services.
 
 ### Step 3: Configuration
 Once the Installer is finished the backblaze client should open automatically.

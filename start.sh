@@ -31,6 +31,7 @@ echo "************************************"
 
 echo "Setting Language to: $LANGUAGE"
 if [ "$GETARCH" == "32" ]; then
+   export MUSL_LOCPATH="/usr/share/i18n/locales/musl"
    export LC_ALL=$LANGUAGE
 fi
 if [ "$GETARCH" == "64" ]; then
