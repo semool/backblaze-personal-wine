@@ -91,7 +91,6 @@ RUN \
     rm /opt/noVNC/app/images/icons/novnc-*.png && \
     ICONSIZE="192x192 152x152 144x144 120x120 96x96 76x76 72x72 64x64 60x60 48x48 32x32 24x24 16x16" && \
     for i in $ICONSIZE; do convert -resize $i logo.png /opt/noVNC/app/images/icons/novnc-$i.png; done && \
-    rm logo.png && \
     #--------------
     # Install openbox theme
     git clone https://github.com/terroo/openbox-themes && \
@@ -127,6 +126,7 @@ RUN \
     mkdir /wine /data && \
     #--------------
     # Cleanup x86/x64
+    rm logo.png && \
     rm -R openbox-themes \
           /opt/noVNC/.git* \
           /opt/noVNC/utils/websockify/.git* && \
