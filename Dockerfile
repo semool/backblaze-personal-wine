@@ -105,7 +105,7 @@ RUN \
     cp /etc/xdg/openbox/rc.xml /root/.config/openbox/rc.xml && \
     #--------------
     # Disable non existent Debian Menu
-    if [ "$ARCH" = "64" ]; then \
+    if [ ! -e "/var/lib/openbox/debian-menu.xml" ]; then \
        sed -i s"/<file>\/var\/lib\/openbox\/debian-menu.xml<\/file>//" /root/.config/openbox/rc.xml \
        ; \
     fi && \
@@ -149,13 +149,37 @@ RUN \
     # Cleanup x64
     if [ "$ARCH" = "64" ]; then \
        rm -rf /var/lib/apt/lists/* \
+              /usr/share/fonts/truetype \
               /usr/share/doc && \
-       apt-get purge git imagemagick \
-       -y && \
+       apt-get purge \
+               # for noVNC
+               git imagemagick \
+               # for numpy
+               #build-base python3-dev py-pip \
+               -y && \
        apt-get autoremove -y && \
        apt-get clean && \
        rm -rf /var/lib/apt/lists/* && \
-       dpkg -r --force-depends fonts-dejavu-core \
+       # Deinstall uneeded Font
+       dpkg -r --force-depends \
+               fonts-dejavu-core \
+               fontconfig fontconfig-config \
+               && \
+       # Possible not needed
+       dpkg --purge --force-depends \
+               libasound2:amd64 libasound2:i386 libasound2-data \
+               libdrm-amdgpu1 libdrm-common libdrm-intel1 libdrm-nouveau2 libdrm-radeon1 libdrm2 \
+               libgstreamer-plugins-base1.0-0:i386 libgstreamer1.0-0:amd64 libgstreamer1.0-0:i386 \
+               libvulkan1:amd64 libvulkan1:i386 \
+               libgpg-error0:i386 libgphoto2-6:amd64 libgphoto2-6:i386 libgphoto2-port12:amd64 libgphoto2-port12:i386 \
+               libsensors-config libsensors5:amd64 \
+               libgl1-mesa-dri:amd64 libllvm7:amd64 libicu63:i386 \
+               libxml2:i386 iso-codes:amd64 \
+               fdisk:amd64 libfdisk1:amd64 libexif12:amd64 libexif12:i386 \
+               libflac8:amd64 libflac8:i386 libmpg123-0:amd64 libmpg123-0:i386 \
+               libopenal1:amd64 libopenal1:i386 libopenal-data \
+               libpulse0:amdd64 libpulse0:i386 libvkd3d1:amd64 libvkd3d1:i386 \
+               libvorbis0a:amd64 libvorbis0a:i386 libvorbisenc2:amd64 libvorbisenc2:i386 \
        ; \
     fi
     #--------------
@@ -191,7 +215,7 @@ ENV WINEDLLOVERRIDES mscoree,mshtml=
 ENV COMPUTER_NAME bz-docker
 
 # Healthcheck for Client GUI
-HEALTHCHECK CMD pidof bzbui.exe >/dev/null || exit 1
+HEALTHCHECK CMD pidof bzserv.exe >/dev/null || exit 1
 
 # Set the start script as entrypoint
 ENTRYPOINT ./start.sh
