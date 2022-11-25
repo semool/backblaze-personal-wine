@@ -120,8 +120,18 @@ If you have to stop the container during the initial backup the backup will cont
 Backblaze is now configured to automatically backup your linux files,  to check the progress or change settings use the VNC Server.
 
 ### Step 4: Client Update
-To reinstall/update the Client start the Container with '-e CLIENTUPDATE=1'
-With '-e CLIENTUPDATE=2' the latest Beta Version will be downloaded.
+To reinstall/update the Client start the Container with ```-e CLIENTUPDATE=1```
+With ```-e CLIENTUPDATE=2``` the latest Beta Version will be downloaded.
 The old Installer will be renamed and then the actual one will be downloaded.
 After this the Installation will start. Go to the VNC Server to complete. The Client will start automaticaly after this.
 When you restart the complete Container set 'CLIENTUPDATE' back to 0.
+
+## Useful Docker commands
+You can open a Explorer Window in your VNC Session to check the mounts:
+```
+docker exec backblaze wine explorer &
+```
+Getting access to the Wine Config Window:
+```
+docker exec backblaze wine winecfg &
+```
