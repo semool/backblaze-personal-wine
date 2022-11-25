@@ -19,6 +19,8 @@ RUN \
        wine xvfb x11vnc openbox samba-winbind-clients tzdata \
        # for noVNC
        bash python3 procps \
+       # numpy for noVNC - optional, not needed for this purpose
+       #py3-numpy \
        # for language
        libintl && \
        #--------------
@@ -28,8 +30,6 @@ RUN \
        cmake make musl-dev gcc gettext-dev \
        # for noVNC
        imagemagick \
-       # for numpy
-       #build-base python3-dev py-pip \
        # for language and novnc
        git \
        #--------------
@@ -57,8 +57,8 @@ RUN \
        wine wine32 wine64 xvfb x11vnc openbox wget locales tzdata ca-certificates \
        # for noVNC
        python3 procps imagemagick git \
-       # for numpy
-       #build-base python3-dev py-pip \
+       # numpy for noVNC - optional, not needed for this purpose
+       #python3-numpy \
        -y \
        ; \
     fi && \
@@ -79,7 +79,6 @@ RUN \
     fc-cache -f "$DEST_DIR" && \
     #--------------
     # Install noVNC
-    # Not needed for this purpose and saves ~100MB # pip install --no-cache-dir numpy && \
     git config --global advice.detachedHead false && \
     git clone https://github.com/novnc/noVNC --branch v1.3.0 /opt/noVNC && \
     git clone https://github.com/novnc/websockify --branch v0.10.0 /opt/noVNC/utils/websockify && \
@@ -154,8 +153,6 @@ RUN \
        apt-get purge \
                # for noVNC
                git imagemagick \
-               # for numpy
-               #build-base python3-dev py-pip \
                -y && \
        apt-get autoremove -y && \
        apt-get clean && \
