@@ -37,14 +37,30 @@ docker build -t backblaze-personal-wine:x64 --build-arg BASEIMAGE="amd64/debian:
 <details>
   <summary>Click to expand!</summary>
 
+* Simple
 ```
 docker run -d \
-    -h Backblaze-PB \
     --init \
-    -p 5900:5900 \
-    -p 6080:6080 \
+    -v backblaze_data:/wine \ #<- This can be a Docker Volume
+    -v /mnt/backblaze-temp:/data \ #<- This must be a Folder that is big enough to save the bigest file from your Backup (look at 'Data Dir Tips')
+    -v /mnt/backupfolder1:/data/backupfolder1 \ #<- A Folder that should be Backuped
+    -v /mnt/backupfolder2:/data/backupfolder2 \ #<- A Folder that should be Backuped
+    --name=backblaze \
+    --restart=always \
+    backblaze-personal-wine:x86 # <- or x64
+```
+
+* Advanced
+```
+docker run -d \
+    -h Backblaze-PB \ # <- The Hostname
+    --init \
+    -p 5900:5900 \ # <- The VNC Port
+    -p 6080:6080 \ # <- The noVNC Webif Port
     -e LANGUAGE=de_DE.UTF-8 \
     -e TZ=Europe/Berlin \
+    -e COMPUTERNAME=pcname \ # <- Wine Computername
+    -e VNCPASSWORD=password \
     -e CLIENTUPDATE=0 \ # <- Set this to 1 (2 for Beta Version) for Client Update/Reinstall
     -v backblaze_data:/wine \ #<- This can be a Docker Volume
     -v /mnt/backblaze-temp:/data \ #<- This must be a Folder that is big enough to save the bigest file from your Backup (look at 'Data Dir Tips')
