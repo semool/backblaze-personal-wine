@@ -191,6 +191,9 @@ ENV LANGUAGE en_US.UTF-8
 # Set Timezone
 ENV TZ Etc/UTC
 
+# Configure the virtual display port
+ENV DISPLAY :0
+
 # Expose the VNC Port
 EXPOSE 5900
 
