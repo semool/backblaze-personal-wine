@@ -14,7 +14,7 @@ if [ "$GETARCH" == "64" ]; then
 fi
 echo "************************************"
 
-if [ "$CLIENTUPDATE" != "0" ]; then
+if [ "$CLIENTUPDATE" != "0" -a -e "$WINEPREFIX/drive_c/" ]; then
    echo "Client Update Mode ON!"
    touch $WINEPREFIX/drive_c/.CLIENTUPDATE
    if [ "$CLIENTUPDATE" == "2" ]; then
@@ -42,9 +42,19 @@ if [ "$GETARCH" == "64" ]; then
 fi
 echo "************************************"
 
+if [ "$VNCPASSWORD" != "none" ]; then
+   echo "Setting the VNC Server Password: $VNCPASSWORD"
+   if [ ! -e "/root/.vnc/" ]; then mkdir /root/.vnc; fi
+   x11vnc -storepasswd $VNCPASSWORD /root/.vnc/passwd &>/dev/null
+   VNCAUTH="-rfbauth /root/.vnc/passwd"
+   echo "************************************"
+else
+   VNCAUTH="-nopw"
+fi
+
 echo "Starting the VNC Server on Port: 5900"
 rm -f /tmp/.X0-lock
-Xvfb :0 -screen 0 910x740x24 & openbox & x11vnc -nopw -q -forever -loop -shared &>/dev/null &
+Xvfb :0 -screen 0 910x740x24 & openbox & x11vnc $VNCAUTH -q -forever -loop -shared &>/dev/null &
 echo "************************************"
 
 echo "Starting the noVNC Webinterface on Port: 6080"
@@ -63,14 +73,14 @@ function configure_wine {
   fi
 
   echo "Setting Wine Registry Entries:"
-  if [ ${#COMPUTER_NAME} -gt 15 ]; then 
+  if [ ${#COMPUTER_NAME} -gt 15 ]; then
     echo "Error: computer name cannot be longer than 15 characters"
     exit 1
   fi
-  echo "- Setting Computer Name: $COMPUTER_NAME"
+  echo "- Setting Computer Name: $COMPUTERNAME"
   wine reg add "HKCU\\SOFTWARE\\Wine\\Network\\" /v UseDnsComputerName /f /d N &>/dev/null
-  wine reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ComputerName" /v ComputerName /f /d $COMPUTER_NAME &>/dev/null
-  wine reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ActiveComputerName" /v ComputerName /f /d $COMPUTER_NAME &>/dev/null
+  wine reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ComputerName" /v ComputerName /f /d $COMPUTERNAME &>/dev/null
+  wine reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ActiveComputerName" /v ComputerName /f /d $COMPUTERNAME &>/dev/null
   echo "- Setting Font DPI"
   wine reg add "HKLM\\SYSTEM\\CurrentControlSet\\Hardware Profiles\\Current\\Software\\Fonts\\" /v LogPixels /t REG_DWORD /f /d 125 &>/dev/null
   echo "- Setting Font Smoothing"

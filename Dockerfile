@@ -3,7 +3,7 @@ FROM $BASEIMAGE
 ARG BASEIMAGE
 
 # Not needed for Alpine and Debian Images, but for Ubuntu
-ENV DEBIAN_FRONTEND=noninteractive
+#ENV DEBIAN_FRONTEND=noninteractive
 
 RUN \
     # Set arch version
@@ -125,7 +125,8 @@ RUN \
     mkdir /wine /data && \
     #--------------
     # Cleanup x86/x64
-    rm logo.png && \
+    rm logo.png \
+       /root/.gitconfig && \
     rm -R openbox-themes \
           /opt/noVNC/.git* \
           /opt/noVNC/utils/websockify/.git* && \
@@ -185,19 +186,25 @@ RUN \
 #COPY start.sh /start.sh
 
 # Set Language
-ENV LANGUAGE=en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
 
 # Set Timezone
-ENV TZ=Etc/UTC
+ENV TZ Etc/UTC
 
 # Configure the virtual display port
 ENV DISPLAY :0
 
-# Expose the VNC and noVNC-Web port
-EXPOSE 5900 6080
+# Expose the VNC Port
+EXPOSE 5900
+
+# Expose the noVNC-Web port
+EXPOSE 6080
+
+# VNC Password
+ENV VNCPASSWORD none
 
 # redownload Client for update/reinstall
-ENV CLIENTUPDATE=0
+ENV CLIENTUPDATE 0
 
 # Configure the wine prefix
 ENV WINEPREFIX /wine
@@ -209,7 +216,7 @@ ENV WINEDEBUG -all
 ENV WINEDLLOVERRIDES mscoree,mshtml=
 
 # Set the wine computer name
-ENV COMPUTER_NAME bz-docker
+ENV COMPUTERNAME bz-docker
 
 # Healthcheck for Client GUI
 HEALTHCHECK CMD pidof bzserv.exe >/dev/null || exit 1
