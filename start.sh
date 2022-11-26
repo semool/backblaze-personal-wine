@@ -29,16 +29,14 @@ echo "Setting Timezone to: $TZ"
 date
 echo "************************************"
 
-echo "Setting Language to: $LANGUAGE"
+echo "Setting Language to: $LANG"
 if [ "$GETARCH" == "32" ]; then
-   export MUSL_LOCPATH="/usr/share/i18n/locales/musl"
-   export LC_ALL=$LANGUAGE
+   export LANG=$LANG
 fi
 if [ "$GETARCH" == "64" ]; then
-   LANGSHORT1=`echo $LANGUAGE | cut -d "." -f1`
-   LANGSHORT2=`echo $LANGUAGE | cut -d "." -f2 | tr '[:upper:]' '[:lower:]' | sed s/-//`
-   localedef -i $LANGSHORT1 -c -f UTF-8 -A /usr/share/locale/locale.alias $LANGUAGE
-   export LANG=$LANGSHORT1.$LANGSHORT2
+   localedef -i `echo $LANG | cut -d "." -f1` -c -f UTF-8 -A /usr/share/locale/locale.alias $LANG
+   export LANG=$LANG
+   export LANGUAGE=$LANG
 fi
 echo "************************************"
 

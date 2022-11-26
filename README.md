@@ -61,8 +61,8 @@ docker run -d \
     --init \
     -p 5900:5900 \ # <- The VNC Port
     -p 6080:6080 \ # <- The noVNC Webif Port
-    -e LANGUAGE=de_DE.UTF-8 \
     -e TZ=Europe/Berlin \
+    -e LANG=de_DE.UTF-8 \
     -e COMPUTERNAME=pcname \ # <- Wine Computername
     -e VNCPASSWORD=password \
     -e CLIENTUPDATE=0 \ # <- Set this to 1 (2 for Beta Version) for Client Update/Reinstall

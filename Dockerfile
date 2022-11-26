@@ -16,31 +16,17 @@ RUN \
     if [ "$ARCH" = "32" ]; then \
        # Install required packages
        apk --update --upgrade --no-cache add \
-       wine xvfb x11vnc openbox samba-winbind-clients tzdata \
+       wine xvfb x11vnc openbox samba-winbind-clients tzdata musl-locales \
        # for noVNC
        bash python3 procps \
        # numpy for noVNC - optional, not needed for this purpose
        #py3-numpy \
-       # for language
-       libintl && \
+       && \
        #--------------
        # Install temporary packages
        apk --update --no-cache --virtual .build-deps add \
-       # for language
-       cmake make musl-dev gcc gettext-dev \
        # for noVNC
-       imagemagick \
-       # for language and novnc
-       git \
-       #--------------
-       && \
-       # Install locales
-       git clone https://gitlab.com/rilian-la-te/musl-locales.git && \
-       cd musl-locales && \
-       cmake -DLOCALE_PROFILE=OFF -DCMAKE_INSTALL_PREFIX:PATH=/usr . && \
-       make && \
-       make install && \
-       cd .. \
+       git imagemagick \
        #--------------
        ; \
     fi && \
@@ -134,7 +120,6 @@ RUN \
     # Cleanup x86
     if [ "$ARCH" = "32" ]; then \
        apk del .build-deps && \
-       rm -R musl-locales && \
        # Workaround for fontconfig invalid cache files spam - BUG!
        rm -R /usr/share/fonts/100dpi \
              /usr/share/fonts/75dpi \
@@ -186,7 +171,7 @@ RUN \
 #COPY start.sh /start.sh
 
 # Set Language
-ENV LANGUAGE en_US.UTF-8
+ENV LANG en_US.UTF-8
 
 # Set Timezone
 ENV TZ Etc/UTC
