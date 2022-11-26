@@ -80,26 +80,14 @@ docker run -d \
 You can set a password to secure the VNC Server by add ```-e VNCPASSWORD=yourpwd``` to the docker run command.
 
 ### Connecting to the VNC Server
-To go through the setup process you must connect to the integrated vnc server via a client like RealVNC Client.
-address: yourip:5900
-
-### Connecting to the VNC Server (Webinterface)
-You can open the noVNC client in your browser (make sure your firewall allows acess to the port):
-address: http://yourip:6080
-
-### https
-When you will add more Security for external Access, you can use [NGINX Proxy Manager](https://github.com/NginxProxyManager/nginx-proxy-manager)
-to get https for the noVNC Webinterface.
+To go through the setup process you must connect to the integrated vnc server. You can use a VNC Client (Port 5900) like [TigerVNC Viewer](https://github.com/TigerVNC/tigervnc) or you can use the integrated noVNC Webinterface (Port 6080).
 
 ### Security
 The server runs an unencrypted integrated VNC server.
-If you need to connect to the vnc server from a different machine (on headless systems), please make sure to configure your firewall to only allow local connections to the VNC.
-firewalld example:
-```
-firewall-cmd --permanent --add-rich-rule "rule family="ipv4" source address="192.168.178.0/24" port port="5900" protocol="tcp" accept"
-firewall-cmd --permanent --add-rich-rule "rule family="ipv4" source address="192.168.178.0/24" port port="6080" protocol="tcp" accept"
-firewall-cmd --reload
-```
+Make sure you dont accept Connections from outside your local Network.
+
+### https
+When you need external access you can use [NGINX Proxy Manager](https://github.com/NginxProxyManager/nginx-proxy-manager) to setup https for the noVNC Webinterface.
 </details><br/>
 
 ## Setup guide
