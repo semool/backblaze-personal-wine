@@ -71,6 +71,10 @@ address: yourip:5900
 You can open the noVNC client in your browser (make sure your firewall allows acess to the port):
 address: http://yourip:6080
 
+### https
+When you will add more Security for external Access, you can use [NGINX Proxy Manager](https://github.com/NginxProxyManager/nginx-proxy-manager)
+to get https for the noVNC Webinterface.
+
 ### Security
 The server runs an unencrypted integrated VNC server.
 If you need to connect to the vnc server from a different machine (on headless systems), please make sure to configure your firewall to only allow local connections to the VNC.
