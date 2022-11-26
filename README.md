@@ -20,24 +20,28 @@ Please note, Linux specific file attributes (like ownership, acls or permissions
 * (x86) Disable Wine Debugger
 * (x86) Workaround for fontconfig cache file spam in /var/cache/fontconfig
 
-## The x64 Image
+### The x64 Image
 It runs fine. But i prefer the x86 one. Its smaller. The only x64 Binaries from the Client are the list and transfer ones. I haven't noticed any benefits from the x64.
 
 ## Container Build Instructions
-* To build the x86 Version:
+<details>
+  <summary>Click to expand!</summary>
+
+### To build the x86 Version:
 ```
 docker build -t backblaze-personal-wine:x86 .
 ```
-* To build the x64 Version:
+### To build the x64 Version:
 ```
 docker build -t backblaze-personal-wine:x64 --build-arg BASEIMAGE="amd64/debian:buster-slim" .
 ```
-
+</details><br/>
+  
 ## Docker run example
 <details>
   <summary>Click to expand!</summary>
 
-* Simple
+### Simple
 ```
 docker run -d \
     --init \
@@ -50,7 +54,7 @@ docker run -d \
     backblaze-personal-wine:x86 # <- or x64
 ```
 
-* Advanced
+### Advanced
 ```
 docker run -d \
     -h Backblaze-PB \ # <- The Hostname
@@ -91,6 +95,8 @@ When you need external access you can use [NGINX Proxy Manager](https://github.c
 </details><br/>
 
 ## Setup guide
+<details>
+  <summary>Click to expand!</summary>
 
 ### Step 1: DATA Dir Tips
 Mount a very Big empty Folder directly to '/data' first. It must have free Space for the bigest File you will Backup.
@@ -134,13 +140,18 @@ With ```-e CLIENTUPDATE=2``` the latest Beta Version will be downloaded.
 The old Installer will be renamed and then the actual one will be downloaded.
 After this the Installation will start. Go to the VNC Server to complete. The Client will start automaticaly after this.
 When you restart the complete Container set 'CLIENTUPDATE' back to 0.
-
+</details><br/>
+  
 ## Useful Docker commands
-You can open a Explorer Window in your VNC Session to check the mounts:
+<details>
+  <summary>Click to expand!</summary>
+
+### You can open a Explorer Window in your VNC Session to check the mounts:
 ```
 docker exec backblaze wine explorer &
 ```
-Getting access to the Wine Config Window:
+### Getting access to the Wine Config Window:
 ```
 docker exec backblaze wine winecfg &
 ```
+</details><br/>
