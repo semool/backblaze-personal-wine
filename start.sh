@@ -44,7 +44,7 @@ echo "************************************"
 
 if [ "$VNCPASSWORD" != "none" ]; then
    echo "Setting the VNC Server Password: $VNCPASSWORD"
-   if [ ! -e "/root/.vnc/" ]; then mkdir /root/.vnc; fi
+   if [ ! -e "/root/.vnc" ]; then mkdir /root/.vnc; fi
    x11vnc -storepasswd $VNCPASSWORD /root/.vnc/passwd &>/dev/null
    VNCAUTH="-rfbauth /root/.vnc/passwd"
    echo "************************************"
@@ -53,6 +53,7 @@ else
 fi
 
 echo "Starting the VNC Server on Port: 5900"
+export DISPLAY=":0"
 rm -f /tmp/.X0-lock
 Xvfb :0 -screen 0 910x740x24 & openbox & x11vnc $VNCAUTH -q -forever -loop -shared &>/dev/null &
 echo "************************************"
