@@ -80,11 +80,13 @@ docker run -d \
 <details>
   <summary>Click to expand!</summary>
 
+### Connecting to the VNC Server
+To go through the setup process you must connect to the integrated vnc server. 
+* You can use a VNC Client (Port 5900) like [TigerVNC Viewer](https://github.com/TigerVNC/tigervnc)
+* or you can use the integrated noVNC Webinterface (Port 6080).
+
 ### VNC Password
 You can set a password to secure the VNC Server by add ```-e VNCPASSWORD=yourpwd``` to the docker run command.
-
-### Connecting to the VNC Server
-To go through the setup process you must connect to the integrated vnc server. You can use a VNC Client (Port 5900) like [TigerVNC Viewer](https://github.com/TigerVNC/tigervnc) or you can use the integrated noVNC Webinterface (Port 6080).
 
 ### Security
 The server runs an unencrypted integrated VNC server.
