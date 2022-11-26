@@ -77,7 +77,8 @@ function configure_wine {
   fi
   echo "- Setting Computer Name: $COMPUTERNAME"
   wine reg add "HKCU\\SOFTWARE\\Wine\\Network\\" /v UseDnsComputerName /f /d N &>/dev/null
-  wine reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\ComputerName\\" /v ComputerName /f /d $COMPUTERNAME &>/dev/null
+  wine reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ComputerName" /v ComputerName /f /d $COMPUTERNAME &>/dev/null
+  wine reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ActiveComputerName" /v ComputerName /f /d $COMPUTERNAME &>/dev/null
   echo "- Setting Font DPI"
   wine reg add "HKLM\\SYSTEM\\CurrentControlSet\\Hardware Profiles\\Current\\Software\\Fonts\\" /v LogPixels /t REG_DWORD /f /d 125 &>/dev/null
   echo "- Setting Font Smoothing"
