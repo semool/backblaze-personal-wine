@@ -91,7 +91,8 @@ The server runs an unencrypted integrated VNC server.
 Make sure you dont accept Connections from outside your local Network.
 
 ### https
-When you need external access you can use [NGINX Proxy Manager](https://github.com/NginxProxyManager/nginx-proxy-manager) to setup https for the noVNC Webinterface.
+When you need access over the Internet you can use [NGINX Proxy Manager](https://github.com/NginxProxyManager/nginx-proxy-manager) to setup https for the noVNC Webinterface.
+Optional you can disable the VNC Port expose when you comment the ```EXPOSE 5900``` in the Dockerfile before you build your Image to only allow Connections to the noVNC Webinterface.
 </details><br/>
 
 ## Setup guide
