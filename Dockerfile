@@ -3,13 +3,14 @@ FROM $BASEIMAGE
 ARG BASEIMAGE
 
 # Not needed for Alpine and Debian Images, but for Ubuntu
-#ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN \
     # Set arch version
     if [ "$BASEIMAGE" = "i386/alpine:3.13.12" ]; then ARCH="32"; \
-    elif [ "$BASEIMAGE" = "amd64/debian:buster-slim" ]; then ARCH="64"; else \
-    echo -e "\033[0;31m!!!!!WARNING!!!!! BASEIMAGE must be 'i386/alpine:3.13.12' or 'amd64/debian:buster-slim'! EXIT BUILD !!!!!WARNING!!!!!\033[0m" && exit 1; \
+    elif [ "$BASEIMAGE" = "amd64/debian:buster-slim" ]; then ARCH="64"; \
+    elif [ "$BASEIMAGE" = "amd64/ubuntu:focal" ]; then ARCH="64"; else \
+    echo -e "\033[0;31m!!!!!WARNING!!!!! BASEIMAGE must be 'i386/alpine:3.13.12', 'amd64/debian:buster-slim' or 'amd64/ubuntu:focal'! EXIT BUILD !!!!!WARNING!!!!!\033[0m" && exit 1; \
     fi && \
     #--------------
     # Install Packages x86
@@ -26,7 +27,9 @@ RUN \
        # Install temporary packages
        apk --update --no-cache --virtual .build-deps add \
        # for noVNC
-       git imagemagick \
+       imagemagick \
+       # for noVNC and openbox theme
+       git \
        #--------------
        ; \
     fi && \
@@ -42,26 +45,20 @@ RUN \
        apt-get --no-install-recommends install \
        wine wine32 wine64 xvfb x11vnc openbox wget locales tzdata ca-certificates \
        # for noVNC
-       python3 procps imagemagick git \
+       python3 procps imagemagick \
        # numpy for noVNC - optional, not needed for this purpose
        #python3-numpy \
+       # for noVNC and openbox theme
+       git \
        -y \
        ; \
     fi && \
     #--------------
     # Install segoe-ui-linux Font instead of ttf-dejavu
-    DEST_DIR="/usr/share/fonts/Microsoft/TrueType/Segoe UI/" && \
+    DEST_DIR="/usr/share/fonts/Microsoft/TrueType/Segoe UI" && \
     mkdir -p "$DEST_DIR" && \
-    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeui.ttf?raw=true -O "$DEST_DIR"/segoeui.ttf && \
-    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuib.ttf?raw=true -O "$DEST_DIR"/segoeuib.ttf && \
-    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuii.ttf?raw=true -O "$DEST_DIR"/segoeuii.ttf && \
-    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuiz.ttf?raw=true -O "$DEST_DIR"/segoeuiz.ttf && \
-    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuil.ttf?raw=true -O "$DEST_DIR"/segoeuil.ttf && \
-    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/seguili.ttf?raw=true -O "$DEST_DIR"/seguili.ttf && \
-    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuisl.ttf?raw=true -O "$DEST_DIR"/segoeuisl.ttf && \
-    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/seguisli.ttf?raw=true -O "$DEST_DIR"/seguisli.ttf && \
-    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/seguisb.ttf?raw=true -O "$DEST_DIR"/seguisb.ttf && \
-    wget https://github.com/mrbvrz/segoe-ui/raw/master/font/seguisbi.ttf?raw=true -O "$DEST_DIR"/seguisbi.ttf && \
+    FONTFILES="segoeui segoeuib segoeuii segoeuiz segoeuil seguili segoeuisl seguisli seguisb seguisbi" && \
+    for f in $FONTFILES; do wget -O "$DEST_DIR/$f.ttf" https://github.com/mrbvrz/segoe-ui/raw/master/font/$f.ttf; done && \
     fc-cache -f "$DEST_DIR" && \
     #--------------
     # Install noVNC
