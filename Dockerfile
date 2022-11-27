@@ -58,7 +58,7 @@ RUN \
     DEST_DIR="/usr/share/fonts/Microsoft/TrueType/Segoe UI" && \
     mkdir -p "$DEST_DIR" && \
     FONTFILES="segoeui segoeuib segoeuii segoeuiz segoeuil seguili segoeuisl seguisli seguisb seguisbi" && \
-    for f in $FONTFILES; do wget -O "$DEST_DIR/$f.ttf" https://github.com/mrbvrz/segoe-ui/raw/master/font/$f.ttf; done && \
+    for f in $FONTFILES; do wget -O "$DEST_DIR/$f.ttf" https://raw.githubusercontent.com/mrbvrz/segoe-ui/master/font/$f.ttf; done && \
     fc-cache -f "$DEST_DIR" && \
     #--------------
     # Install noVNC
