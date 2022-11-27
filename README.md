@@ -8,8 +8,7 @@ Please note, Linux specific file attributes (like ownership, acls or permissions
 * The original x86 Image comes from [tom300z](https://github.com/tom300z/backblaze-personal-wine)
 * Multi Dockerfile for x86 and x64
 * (x86) Alpine version 3.13.12, Wine 4.0.3, Image Size only ~348MB!
-* (x64) Debian 10 Buster, Wine 4.0.2, Image Size ~700MB!
-* (x64) Ubuntu 20.04 Focal, Wine 5.0.3, Image Size ~999MB!
+* (x64) Debian 10 Buster, Wine 4.0.2, Image Size ~697MB!
 * Adding user configurable LANGUAGE and TIMEZONE. Defaults are 'en_US.UTF-8' and 'Etc/UTC'
 * Disable openbox right click root menu (not needed)
 * Install a dark [Theme (Afterpiece)](https://github.com/terroo/openbox-themes/tree/main/Afterpiece) for Openbox
@@ -36,10 +35,6 @@ docker build -t backblaze-personal-wine:x86.alpine .
 ```
 docker build -t backblaze-personal-wine:x64.debian --build-arg BASEIMAGE="amd64/debian:buster-slim" .
 ```
-
-```
-docker build -t backblaze-personal-wine:x64.ubuntu --build-arg BASEIMAGE="amd64/ubuntu:focal" .
-```
 </details><br/>
   
 ## Docker run example
@@ -56,7 +51,7 @@ docker run -d \
     -v /mnt/backupfolder2:/data/backupfolder2 \ #<- A Folder that should be Backuped
     --name=backblaze \
     --restart=always \
-    backblaze-personal-wine:x86.alpine # <- or x64.[debian][ubuntu]
+    backblaze-personal-wine:x86.alpine # <- or x64.debian
 ```
 
 ### Advanced
@@ -77,7 +72,7 @@ docker run -d \
     -v /mnt/backupfolder2:/data/backupfolder2 \ #<- A Folder that should be Backuped
     --name=backblaze \
     --restart=always \
-    backblaze-personal-wine:x86.alpine # <- or x64.[debian][ubuntu]
+    backblaze-personal-wine:x86.alpine # <- or x64.debian
 ```
 </details><br/>
 

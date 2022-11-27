@@ -1,16 +1,56 @@
 ARG BASEIMAGE="i386/alpine:3.13.12"
+
+FROM i386/alpine:3.13.12 AS builder
+
+# Create Builder Image
+RUN \
+    # Install required packages
+    apk --update --no-cache --virtual add imagemagick git && \
+    #--------------
+    # Get segoe-ui-linux Font
+    DEST_DIR=/usr/share/fonts/Microsoft/TrueType/SegoeUI && \
+    mkdir -p $DEST_DIR && \
+    FONTFILES="segoeui segoeuib segoeuii segoeuiz segoeuil seguili segoeuisl seguisli seguisb seguisbi" && \
+    for f in $FONTFILES; do wget -O $DEST_DIR/$f.ttf https://raw.githubusercontent.com/mrbvrz/segoe-ui/master/font/$f.ttf; done && \
+    #--------------
+    # Get noVNC
+    git config --global advice.detachedHead false && \
+    git clone https://github.com/novnc/noVNC --branch v1.3.0 /opt/noVNC && \
+    git clone https://github.com/novnc/websockify --branch v0.10.0 /opt/noVNC/utils/websockify && \
+    ln -s /opt/noVNC/vnc.html /opt/noVNC/index.html && \
+    sed -i s"/'autoconnect', false/'autoconnect', 'true'/" /opt/noVNC/app/ui.js && \
+    rm -r /opt/noVNC/.git* /opt/noVNC/utils/websockify/.git* && \
+    #--------------
+    # Replace noVNC Icons
+    wget -O logo.png https://www.backblaze.com/blog/wp-content/uploads/2017/12/backblaze_icon_transparent.png && \
+    rm /opt/noVNC/app/images/icons/novnc-*.png && \
+    ICONSIZE="192x192 152x152 144x144 120x120 96x96 76x76 72x72 64x64 60x60 48x48 32x32 24x24 16x16" && \
+    for i in $ICONSIZE; do convert -resize $i logo.png /opt/noVNC/app/images/icons/novnc-$i.png; done && \
+    #--------------
+    # Get openbox theme
+    git clone https://github.com/terroo/openbox-themes
+    #--------------
+
 FROM $BASEIMAGE
 ARG BASEIMAGE
 
 # Not needed for Alpine and Debian Images, but for Ubuntu
-ENV DEBIAN_FRONTEND=noninteractive
+#ENV DEBIAN_FRONTEND=noninteractive
 
+# Get Files from the builder image
+# Install segoe-ui-linux Font instead of ttf-dejavu
+COPY --from=builder /usr/share/fonts/Microsoft/TrueType/SegoeUI ./usr/share/fonts/Microsoft/TrueType/SegoeUI
+# Install noVNC
+COPY --from=builder /opt/noVNC ./opt/noVNC
+# Install openbox theme
+COPY --from=builder /openbox-themes/Afterpiece ./root/.themes/Afterpiece
+
+# Build Final Image
 RUN \
     # Set arch version
     if [ "$BASEIMAGE" = "i386/alpine:3.13.12" ]; then ARCH="32"; \
-    elif [ "$BASEIMAGE" = "amd64/debian:buster-slim" ]; then ARCH="64"; \
-    elif [ "$BASEIMAGE" = "amd64/ubuntu:focal" ]; then ARCH="64"; else \
-    echo -e "\033[0;31m!!!!!WARNING!!!!! BASEIMAGE must be 'i386/alpine:3.13.12', 'amd64/debian:buster-slim' or 'amd64/ubuntu:focal'! EXIT BUILD !!!!!WARNING!!!!!\033[0m" && exit 1; \
+    elif [ "$BASEIMAGE" = "amd64/debian:buster-slim" ]; then ARCH="64"; else \
+    echo -e "\033[0;31m!!!!!WARNING!!!!! BASEIMAGE must be 'i386/alpine:3.13.12' or 'amd64/debian:buster-slim'! EXIT BUILD !!!!!WARNING!!!!!\033[0m" && exit 1; \
     fi && \
     #--------------
     # Install Packages x86
@@ -22,14 +62,6 @@ RUN \
        bash python3 procps \
        # numpy for noVNC - optional, not needed for this purpose
        #py3-numpy \
-       && \
-       #--------------
-       # Install temporary packages
-       apk --update --no-cache --virtual .build-deps add \
-       # for noVNC
-       imagemagick \
-       # for noVNC and openbox theme
-       git \
        #--------------
        ; \
     fi && \
@@ -45,78 +77,34 @@ RUN \
        apt-get --no-install-recommends install \
        wine wine32 wine64 xvfb x11vnc openbox wget locales tzdata ca-certificates \
        # for noVNC
-       python3 procps imagemagick \
+       python3 procps \
        # numpy for noVNC - optional, not needed for this purpose
        #python3-numpy \
-       # for noVNC and openbox theme
-       git \
        -y \
        ; \
     fi && \
     #--------------
-    # Install segoe-ui-linux Font instead of ttf-dejavu
-    DEST_DIR="/usr/share/fonts/Microsoft/TrueType/Segoe UI" && \
-    mkdir -p "$DEST_DIR" && \
-    FONTFILES="segoeui segoeuib segoeuii segoeuiz segoeuil seguili segoeuisl seguisli seguisb seguisbi" && \
-    for f in $FONTFILES; do wget -O "$DEST_DIR/$f.ttf" https://raw.githubusercontent.com/mrbvrz/segoe-ui/master/font/$f.ttf; done && \
-    fc-cache -f "$DEST_DIR" && \
+    # Rebuild Font Cache
+    fc-cache -f /usr/share/fonts/Microsoft/TrueType/SegoeUI && \
     #--------------
-    # Install noVNC
-    git config --global advice.detachedHead false && \
-    git clone https://github.com/novnc/noVNC --branch v1.3.0 /opt/noVNC && \
-    git clone https://github.com/novnc/websockify --branch v0.10.0 /opt/noVNC/utils/websockify && \
-    ln -s /opt/noVNC/vnc.html /opt/noVNC/index.html && \
-    sed -i s"/'autoconnect', false/'autoconnect', 'true'/" /opt/noVNC/app/ui.js && \
-    #--------------
-    # Replace noVNC Icons
-    wget -O logo.png https://www.backblaze.com/blog/wp-content/uploads/2017/12/backblaze_icon_transparent.png && \
-    rm /opt/noVNC/app/images/icons/novnc-*.png && \
-    ICONSIZE="192x192 152x152 144x144 120x120 96x96 76x76 72x72 64x64 60x60 48x48 32x32 24x24 16x16" && \
-    for i in $ICONSIZE; do convert -resize $i logo.png /opt/noVNC/app/images/icons/novnc-$i.png; done && \
-    #--------------
-    # Install openbox theme
-    git clone https://github.com/terroo/openbox-themes && \
-    mkdir -p /root/.themes && \
-    cd openbox-themes && \
-    mv Afterpiece /root/.themes/ && \
-    cd .. && \
-    #--------------
-    # Copy openbox config
+    # Edit openbox config
     mkdir -p /root/.config/openbox && \
-    cp /etc/xdg/openbox/rc.xml /root/.config/openbox/rc.xml && \
-    #--------------
+    OBCONF="/root/.config/openbox/rc.xml" && \
+    cp /etc/xdg/openbox/rc.xml $OBCONF && \
     # Disable non existent Debian Menu
-    if [ ! -e "/var/lib/openbox/debian-menu.xml" ]; then \
-       sed -i s"/<file>\/var\/lib\/openbox\/debian-menu.xml<\/file>//" /root/.config/openbox/rc.xml \
-       ; \
-    fi && \
-    #--------------
+    sed -i s"/<file>\/var\/lib\/openbox\/debian-menu.xml<\/file>//" $OBCONF && \
     # Set openbox theme
-    sed -i s"/<name>Clearlooks<\/name>/<name>Afterpiece<\/name>/" /root/.config/openbox/rc.xml && \
-    #--------------
+    sed -i s"/<name>Clearlooks<\/name>/<name>Afterpiece<\/name>/" $OBCONF && \
     # Set openbox Titlebar Font Size
-    sed -i s"/<size>8<\/size>/<size>10<\/size>/" /root/.config/openbox/rc.xml && \
-    #--------------
+    sed -i s"/<size>8<\/size>/<size>10<\/size>/" $OBCONF && \
     # Disable openbox right click root menu
-    sed -i s"/<action name=\"ShowMenu\"><menu>root-menu<\/menu><\/action>//" /root/.config/openbox/rc.xml && \
-    #--------------
-    # get start.sh direct from Github
-    wget https://raw.githubusercontent.com/semool/backblaze-personal-wine/master/start.sh && \
-    chmod 755 start.sh && \
+    sed -i s"/<action name=\"ShowMenu\"><menu>root-menu<\/menu><\/action>//" $OBCONF && \
     #--------------
     # Create wineprefix and data dir
     mkdir /wine /data && \
     #--------------
-    # Cleanup x86/x64
-    rm logo.png \
-       /root/.gitconfig && \
-    rm -R openbox-themes \
-          /opt/noVNC/.git* \
-          /opt/noVNC/utils/websockify/.git* && \
-    #--------------
     # Cleanup x86
     if [ "$ARCH" = "32" ]; then \
-       apk del .build-deps && \
        # Workaround for fontconfig invalid cache files spam - BUG!
        rm -R /usr/share/fonts/100dpi \
              /usr/share/fonts/75dpi \
@@ -133,10 +121,6 @@ RUN \
        rm -rf /var/lib/apt/lists/* \
               /usr/share/fonts/truetype \
               /usr/share/doc && \
-       apt-get purge \
-               # for noVNC
-               git imagemagick \
-               -y && \
        apt-get autoremove -y && \
        apt-get clean && \
        rm -rf /var/lib/apt/lists/* && \
@@ -145,8 +129,10 @@ RUN \
                fonts-dejavu-core \
                fontconfig fontconfig-config \
                && \
-       # Possible not needed
+       # Purge Possible not needed packages dirty
        dpkg --purge --force-depends \
+               libsndfile1:amd64 libsndfile1:i386 \
+               libsndio7.0:amd64 libsndio7.0:i386 \
                libasound2:amd64 libasound2:i386 libasound2-data \
                libdrm-amdgpu1 libdrm-common libdrm-intel1 libdrm-nouveau2 libdrm-radeon1 libdrm2 \
                libgstreamer-plugins-base1.0-0:i386 libgstreamer1.0-0:amd64 libgstreamer1.0-0:i386 \
@@ -161,7 +147,11 @@ RUN \
                libpulse0:amdd64 libpulse0:i386 libvkd3d1:amd64 libvkd3d1:i386 \
                libvorbis0a:amd64 libvorbis0a:i386 libvorbisenc2:amd64 libvorbisenc2:i386 \
        ; \
-    fi
+    fi && \
+    #--------------
+    # get start.sh direct from Github
+    wget https://raw.githubusercontent.com/semool/backblaze-personal-wine/master/start.sh && \
+    chmod 755 start.sh
     #--------------
 
 # Copy the start script to the container
