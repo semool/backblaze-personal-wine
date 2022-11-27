@@ -30,15 +30,15 @@ It runs fine. But i prefer the x86 one. Its smaller. The only x64 Binaries from 
 
 ### To build the x86 Version:
 ```
-docker build -t backblaze-personal-wine:x86 .
+docker build -t backblaze-personal-wine:x86.alpine .
 ```
 ### To build the x64 Version:
 ```
-docker build -t backblaze-personal-wine:x64 --build-arg BASEIMAGE="amd64/debian:buster-slim" .
+docker build -t backblaze-personal-wine:x64.debian --build-arg BASEIMAGE="amd64/debian:buster-slim" .
 ```
 
 ```
-docker build -t backblaze-personal-wine:x64 --build-arg BASEIMAGE="amd64/ubuntu:focal" .
+docker build -t backblaze-personal-wine:x64.ubuntu --build-arg BASEIMAGE="amd64/ubuntu:focal" .
 ```
 </details><br/>
   
@@ -56,7 +56,7 @@ docker run -d \
     -v /mnt/backupfolder2:/data/backupfolder2 \ #<- A Folder that should be Backuped
     --name=backblaze \
     --restart=always \
-    backblaze-personal-wine:x86 # <- or x64
+    backblaze-personal-wine:x86.alpine # <- or x64.[debian][ubuntu]
 ```
 
 ### Advanced
@@ -77,7 +77,7 @@ docker run -d \
     -v /mnt/backupfolder2:/data/backupfolder2 \ #<- A Folder that should be Backuped
     --name=backblaze \
     --restart=always \
-    backblaze-personal-wine:x86 # <- or x64
+    backblaze-personal-wine:x86.alpine # <- or x64.[debian][ubuntu]
 ```
 </details><br/>
 
