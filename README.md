@@ -1,4 +1,7 @@
-# backblaze-personal-wine
+![Last Commit](https://img.shields.io/github/last-commit/semool/backblaze-personal-wine?style=flat-square)
+![x86 Image Size (compressed)](https://img.shields.io/docker/image-size/loomes/backblaze-personal-wine/x86.alpine?color=magenta&label=x86%20Image%20%28compressed%29&style=flat-square)
+![x64 Image Size (compressed)](https://img.shields.io/docker/image-size/loomes/backblaze-personal-wine/x64.debian?color=magenta&label=x64%20Image%20%28compressed%29&style=flat-square)
+![Docker Pulls](https://img.shields.io/docker/pulls/loomes/backblaze-personal-wine?style=flat-square)
 
 ## Infos
 Looking for a (relatively) easy way to backup your personal linux system via Backblaze Personal unlimited? 
