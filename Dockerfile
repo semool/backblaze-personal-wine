@@ -1,5 +1,4 @@
 ARG BASEIMAGE="i386/alpine:3.13.12"
-
 FROM i386/alpine:3.13.12 AS builder
 
 # Create Builder Image
@@ -8,26 +7,28 @@ RUN \
     apk --update --no-cache --virtual add imagemagick git && \
     #--------------
     # Get segoe-ui-linux Font
-    DEST_DIR=/usr/share/fonts/Microsoft/TrueType/SegoeUI && \
-    mkdir -p $DEST_DIR && \
+    FONTPATH=/usr/share/fonts/Microsoft/TrueType/SegoeUI && \
+    mkdir -p $FONTPATH && \
     FONTFILES="segoeui segoeuib segoeuii segoeuiz segoeuil seguili segoeuisl seguisli seguisb seguisbi" && \
-    for f in $FONTFILES; do wget -O $DEST_DIR/$f.ttf https://raw.githubusercontent.com/mrbvrz/segoe-ui/master/font/$f.ttf; done && \
+    for f in $FONTFILES; do wget -O $FONTPATH/$f.ttf https://raw.githubusercontent.com/mrbvrz/segoe-ui/master/font/$f.ttf; done && \
+    #fc-cache -f $FONTPATH && \
     #--------------
     # Get noVNC
+    NOVNCPATH="/opt/noVNC" && \
     git config --global advice.detachedHead false && \
-    git clone https://github.com/novnc/noVNC --branch v1.3.0 /opt/noVNC && \
-    git clone https://github.com/novnc/websockify --branch v0.10.0 /opt/noVNC/utils/websockify && \
-    ln -s /opt/noVNC/vnc.html /opt/noVNC/index.html && \
-    sed -i s"/'autoconnect', false/'autoconnect', 'true'/" /opt/noVNC/app/ui.js && \
-    rm -r /opt/noVNC/.git* /opt/noVNC/utils/websockify/.git* && \
+    git clone https://github.com/novnc/noVNC --branch v1.3.0 $NOVNCPATH && \
+    git clone https://github.com/novnc/websockify --branch v0.10.0 $NOVNCPATH/utils/websockify && \
+    ln -s $NOVNCPATH/vnc.html $NOVNCPATH/index.html && \
+    sed -i s"/'autoconnect', false/'autoconnect', 'true'/" $NOVNCPATH/app/ui.js && \
+    rm -r $NOVNCPATH/.git* $NOVNCPATH/utils/websockify/.git* && \
     #--------------
     # Replace noVNC Icons
     wget -O logo.png https://www.backblaze.com/blog/wp-content/uploads/2017/12/backblaze_icon_transparent.png && \
-    rm /opt/noVNC/app/images/icons/novnc-*.png && \
+    rm $NOVNCPATH/app/images/icons/novnc-*.png && \
     ICONSIZE="192x192 152x152 144x144 120x120 96x96 76x76 72x72 64x64 60x60 48x48 32x32 24x24 16x16" && \
-    for i in $ICONSIZE; do convert -resize $i logo.png /opt/noVNC/app/images/icons/novnc-$i.png; done && \
+    for i in $ICONSIZE; do convert -resize $i logo.png $NOVNCPATH/app/images/icons/novnc-$i.png; done && \
     #--------------
-    # Get openbox theme
+    # Get openbox themes
     git clone https://github.com/terroo/openbox-themes
     #--------------
 
@@ -75,12 +76,30 @@ RUN \
        apt-get update && \
        apt-get upgrade -y && \
        apt-get --no-install-recommends install \
-       wine wine32 wine64 xvfb x11vnc openbox wget locales tzdata ca-certificates \
+       xvfb x11vnc openbox wget locales tzdata ca-certificates fonts-dejavu \
+       #wine wine32 wine64 \
        # for noVNC
        python3 procps \
        # numpy for noVNC - optional, not needed for this purpose
        #python3-numpy \
        -y \
+       #--------------
+       # Install WineHQ
+       && \
+       WINEDISTRO="buster" && \
+       WINEBRANCH="stable" && \
+       WINEVERSION="4.0.4~buster" && \
+       mkdir -pm755 /etc/apt/keyrings && \
+       wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key && \
+       wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/$WINEDISTRO/winehq-$WINEDISTRO.sources && \
+       apt-get update && \
+       apt-get --no-install-recommends install \
+       winehq-$WINEBRANCH=$WINEVERSION \
+       wine-$WINEBRANCH=$WINEVERSION \
+       wine-$WINEBRANCH-amd64=$WINEVERSION \
+       wine-$WINEBRANCH-i386=$WINEVERSION \
+       -y \
+       #--------------
        ; \
     fi && \
     #--------------
@@ -88,8 +107,8 @@ RUN \
     fc-cache -f /usr/share/fonts/Microsoft/TrueType/SegoeUI && \
     #--------------
     # Edit openbox config
-    mkdir -p /root/.config/openbox && \
     OBCONF="/root/.config/openbox/rc.xml" && \
+    mkdir -p /root/.config/openbox && \
     cp /etc/xdg/openbox/rc.xml $OBCONF && \
     # Disable non existent Debian Menu
     sed -i s"/<file>\/var\/lib\/openbox\/debian-menu.xml<\/file>//" $OBCONF && \
@@ -119,33 +138,32 @@ RUN \
     # Cleanup x64
     if [ "$ARCH" = "64" ]; then \
        rm -rf /var/lib/apt/lists/* \
-              /usr/share/fonts/truetype \
               /usr/share/doc && \
        apt-get autoremove -y && \
        apt-get clean && \
        rm -rf /var/lib/apt/lists/* && \
-       # Deinstall uneeded Font
-       dpkg -r --force-depends \
-               fonts-dejavu-core \
-               fontconfig fontconfig-config \
-               && \
        # Purge Possible not needed packages dirty
        dpkg --purge --force-depends \
                libsndfile1:amd64 libsndfile1:i386 \
                libsndio7.0:amd64 libsndio7.0:i386 \
                libasound2:amd64 libasound2:i386 libasound2-data \
-               libdrm-amdgpu1 libdrm-common libdrm-intel1 libdrm-nouveau2 libdrm-radeon1 libdrm2 \
-               libgstreamer-plugins-base1.0-0:i386 libgstreamer1.0-0:amd64 libgstreamer1.0-0:i386 \
+               libdrm-amdgpu1 libdrm-common libdrm-intel1 libdrm-nouveau2 libdrm-radeon1 libdrm2:amd64 libdrm2:i386 \
+               libgstreamer-plugins-base1.0-0:amd64 libgstreamer-plugins-base1.0-0:i386 libgstreamer1.0-0:amd64 libgstreamer1.0-0:i386 \
                libvulkan1:amd64 libvulkan1:i386 \
                libgpg-error0:i386 libgphoto2-6:amd64 libgphoto2-6:i386 libgphoto2-port12:amd64 libgphoto2-port12:i386 \
                libsensors-config libsensors5:amd64 \
                libgl1-mesa-dri:amd64 libllvm7:amd64 libicu63:i386 \
-               libxml2:i386 iso-codes:amd64 \
-               fdisk:amd64 libfdisk1:amd64 libexif12:amd64 libexif12:i386 \
+               libxml2:i386 iso-codes \
+               libexif12:amd64 libexif12:i386 \
                libflac8:amd64 libflac8:i386 libmpg123-0:amd64 libmpg123-0:i386 \
                libopenal1:amd64 libopenal1:i386 libopenal-data \
-               libpulse0:amdd64 libpulse0:i386 libvkd3d1:amd64 libvkd3d1:i386 \
+               libpulse0:amd64 libpulse0:i386 libvkd3d1:amd64 libvkd3d1:i386 \
                libvorbis0a:amd64 libvorbis0a:i386 libvorbisenc2:amd64 libvorbisenc2:i386 \
+               libavcodec58:amd64 libavcodec58:i386 \
+               libatomic1:amd64 libatomic1:i386 \
+               libx264-155:amd64 libx264-155:i386 \
+               libsamplerate0:amd64 libsamplerate0:i386 \
+               libgnutls30:i386 \
        ; \
     fi && \
     #--------------

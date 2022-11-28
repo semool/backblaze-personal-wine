@@ -8,7 +8,7 @@ Please note, Linux specific file attributes (like ownership, acls or permissions
 * The original x86 Image comes from [tom300z](https://github.com/tom300z/backblaze-personal-wine)
 * Multi Dockerfile for x86 and x64
 * (x86) Alpine version 3.13.12, Wine 4.0.3, Image Size only ~348MB!
-* (x64) Debian 10 Buster, Wine 4.0.2, Image Size ~697MB!
+* (x64) Debian 10 Buster, Wine 4.0.4, Image Size ~762MB!
 * Adding user configurable LANGUAGE and TIMEZONE. Defaults are 'en_US.UTF-8' and 'Etc/UTC'
 * Disable openbox right click root menu (not needed)
 * Install a dark [Theme (Afterpiece)](https://github.com/terroo/openbox-themes/tree/main/Afterpiece) for Openbox
@@ -151,9 +151,17 @@ When you restart the complete Container set 'CLIENTUPDATE' back to 0.
 <details>
   <summary>Click to expand!</summary>
 
+### Open a bash Shell for the Container:
+```
+docker exec -it backblaze bash
+```
 ### You can open a Explorer Window in your VNC Session to check the mounts:
 ```
 docker exec backblaze wine explorer &
+```
+### Getting access to the Registry:
+```
+docker exec backblaze wine registry &
 ```
 ### Getting access to the Wine Config Window:
 ```
