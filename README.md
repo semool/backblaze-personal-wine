@@ -15,6 +15,7 @@ Please note, Linux specific file attributes (like ownership, acls or permissions
 * Adding Font [segoe-ui-linux](https://github.com/mrbvrz/segoe-ui-linux) for the Gui instead of ttf-dejavu
 * Adding [noVNC](https://github.com/novnc/noVNC) Webinterface
 * Adding Backblaze noVNC Icons
+* Making the virtual Display Size configurable (Default: 910x740)
 * Adding ENV to initiate a Client Redownload/Update
 * Changing Wine DPI and activate Font Smoothing
 * (x86) Disable Wine Debugger
@@ -65,6 +66,7 @@ docker run -d \
     -e LANG=de_DE.UTF-8 \
     -e COMPUTERNAME=pcname \ # <- Wine Computername
     -e VNCPASSWORD=password \
+    -e DISPLAYSIZE=910x740 \ # <- The virtual Display Size
     -e CLIENTUPDATE=0 \ # <- Set this to 1 (2 for Beta Version) for Client Update/Reinstall
     -v backblaze_data:/wine \ #<- This can be a Docker Volume
     -v /mnt/backblaze-temp:/data \ #<- This must be a Folder that is big enough to save the bigest file from your Backup (look at 'Data Dir Tips')

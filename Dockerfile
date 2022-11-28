@@ -184,6 +184,9 @@ ENV TZ Etc/UTC
 # Configure the virtual display port
 ENV DISPLAY :0
 
+# Displaysize
+ENV DISPLAYSIZE 910x740
+
 # Expose the VNC Port
 EXPOSE 5900
 

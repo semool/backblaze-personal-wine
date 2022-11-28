@@ -52,7 +52,7 @@ fi
 
 echo "Starting the VNC Server on Port: 5900"
 rm -f /tmp/.X0-lock
-Xvfb $DISPLAY -screen 0 910x740x24 & openbox & x11vnc $VNCAUTH -q -forever -loop -shared &>/dev/null &
+Xvfb $DISPLAY -screen 0 "$DISPLAYSIZE"x24 & openbox & x11vnc $VNCAUTH -q -forever -loop -shared &>/dev/null &
 echo "************************************"
 
 echo "Starting the noVNC Webinterface on Port: 6080"
