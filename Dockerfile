@@ -39,18 +39,22 @@ ARG BASEIMAGE
 #ENV DEBIAN_FRONTEND=noninteractive
 
 # Get Files from the builder image
+
 # Install segoe-ui-linux Font instead of ttf-dejavu
 COPY --from=builder /usr/share/fonts/Microsoft/TrueType/SegoeUI ./usr/share/fonts/Microsoft/TrueType/SegoeUI
+#--------------
 # Install noVNC
 COPY --from=builder /opt/noVNC ./opt/noVNC
+#--------------
 # Install openbox theme
 COPY --from=builder /openbox-themes/Afterpiece ./root/.themes/Afterpiece
+#--------------
 
 # Build Final Image
 RUN \
     # Set arch version
     if [ "$BASEIMAGE" = "i386/alpine:3.13.12" ]; then ARCH="32"; \
-    elif [ "$BASEIMAGE" = "amd64/debian:buster-slim" ]; then ARCH="64"; else \
+    elif [ "$BASEIMAGE" = "amd64/debian:buster-slim" ]; then ARCH="64" && DISTRO="debian" && DISTROVERSION="buster"; else \
     echo -e "\033[0;31m!!!!!WARNING!!!!! BASEIMAGE must be 'i386/alpine:3.13.12' or 'amd64/debian:buster-slim'! EXIT BUILD !!!!!WARNING!!!!!\033[0m" && exit 1; \
     fi && \
     #--------------
@@ -86,12 +90,12 @@ RUN \
        #--------------
        # Install WineHQ
        && \
-       WINEDISTRO="buster" && \
+       WINEDISTRO="$DISTROVERSION" && \
        WINEBRANCH="stable" && \
-       WINEVERSION="4.0.4~buster" && \
-       mkdir -pm755 /etc/apt/keyrings && \
+       WINEVERSION="4.0.4~$DISTROVERSION" && \
+       mkdir -p /etc/apt/keyrings && \
        wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key && \
-       wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/$WINEDISTRO/winehq-$WINEDISTRO.sources && \
+       wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/$DISTRO/dists/$WINEDISTRO/winehq-$WINEDISTRO.sources && \
        apt-get update && \
        apt-get --no-install-recommends install \
        winehq-$WINEBRANCH=$WINEVERSION \
@@ -134,6 +138,7 @@ RUN \
              /usr/share/fonts/misc \
              /var/cache/fontconfig && \
        ln -s /dev/null /var/cache/fontconfig \
+       #--------------
        ; \
     fi && \
     #--------------
@@ -144,33 +149,6 @@ RUN \
        apt-get autoremove -y && \
        apt-get clean && \
        rm -rf /var/lib/apt/lists/* \
-       # Purge Possible not needed packages dirty
-       #&& \
-       #dpkg --purge --force-depends \
-       #     libdrm-amdgpu1 libdrm-common libdrm-intel1 libdrm-nouveau2 libdrm-radeon1 libdrm2:amd64 libdrm2:i386 \
-       #     libgstreamer-plugins-base1.0-0:amd64 libgstreamer-plugins-base1.0-0:i386 libgstreamer1.0-0:amd64 libgstreamer1.0-0:i386 \
-       #     libsensors5:amd64 libsensors-config \
-       #     libasound2:amd64 libasound2:i386 libasound2-data \
-       #     libopenal1:amd64 libopenal1:i386 libopenal-data \
-       #     libgphoto2-port12:amd64 libgphoto2-port12:i386 \
-       #     libgphoto2-6:amd64 libgphoto2-6:i386 \
-       #     libsamplerate0:amd64 libsamplerate0:i386 \
-       #     libvulkan1:amd64 libvulkan1:i386 \
-       #     libsndfile1:amd64 libsndfile1:i386 \
-       #     libsndio7.0:amd64 libsndio7.0:i386 \
-       #     libexif12:amd64 libexif12:i386 \
-       #     libflac8:amd64 libflac8:i386 \
-       #     libmpg123-0:amd64 libmpg123-0:i386 \
-       #     libpulse0:amd64 libpulse0:i386 \
-       #     libvkd3d1:amd64 libvkd3d1:i386 \
-       #     libvorbis0a:amd64 libvorbis0a:i386 \
-       #     libvorbisenc2:amd64 libvorbisenc2:i386 \
-       #     libavcodec58:amd64 libavcodec58:i386 \
-       #     libatomic1:amd64 libatomic1:i386 \
-       #     libx264-155:amd64 libx264-155:i386 \
-       #     libgl1-mesa-dri:amd64 libgl1-mesa-dri:i386 \
-       #     libllvm7:amd64 libllvm7:i386 \
-       #     iso-codes \
        ; \
     fi && \
     #--------------
