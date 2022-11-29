@@ -143,28 +143,34 @@ RUN \
               /usr/share/doc && \
        apt-get autoremove -y && \
        apt-get clean && \
-       rm -rf /var/lib/apt/lists/* && \
+       rm -rf /var/lib/apt/lists/* \
        # Purge Possible not needed packages dirty
-       dpkg --purge --force-depends \
-               libsndfile1:amd64 libsndfile1:i386 \
-               libsndio7.0:amd64 libsndio7.0:i386 \
-               libasound2:amd64 libasound2:i386 libasound2-data \
-               libdrm-amdgpu1 libdrm-common libdrm-intel1 libdrm-nouveau2 libdrm-radeon1 libdrm2:amd64 libdrm2:i386 \
-               libgstreamer-plugins-base1.0-0:amd64 libgstreamer-plugins-base1.0-0:i386 libgstreamer1.0-0:amd64 libgstreamer1.0-0:i386 \
-               libvulkan1:amd64 libvulkan1:i386 \
-               libgpg-error0:i386 libgphoto2-6:amd64 libgphoto2-6:i386 libgphoto2-port12:amd64 libgphoto2-port12:i386 \
-               libsensors-config libsensors5:amd64 \
-               libgl1-mesa-dri:amd64 libllvm7:amd64 libicu63:i386 \
-               libxml2:i386 iso-codes \
-               libexif12:amd64 libexif12:i386 \
-               libflac8:amd64 libflac8:i386 libmpg123-0:amd64 libmpg123-0:i386 \
-               libopenal1:amd64 libopenal1:i386 libopenal-data \
-               libpulse0:amd64 libpulse0:i386 libvkd3d1:amd64 libvkd3d1:i386 \
-               libvorbis0a:amd64 libvorbis0a:i386 libvorbisenc2:amd64 libvorbisenc2:i386 \
-               libavcodec58:amd64 libavcodec58:i386 \
-               libatomic1:amd64 libatomic1:i386 \
-               libx264-155:amd64 libx264-155:i386 \
-               libsamplerate0:amd64 libsamplerate0:i386 \
+       #&& \
+       #dpkg --purge --force-depends \
+       #     libdrm-amdgpu1 libdrm-common libdrm-intel1 libdrm-nouveau2 libdrm-radeon1 libdrm2:amd64 libdrm2:i386 \
+       #     libgstreamer-plugins-base1.0-0:amd64 libgstreamer-plugins-base1.0-0:i386 libgstreamer1.0-0:amd64 libgstreamer1.0-0:i386 \
+       #     libsensors5:amd64 libsensors-config \
+       #     libasound2:amd64 libasound2:i386 libasound2-data \
+       #     libopenal1:amd64 libopenal1:i386 libopenal-data \
+       #     libgphoto2-port12:amd64 libgphoto2-port12:i386 \
+       #     libgphoto2-6:amd64 libgphoto2-6:i386 \
+       #     libsamplerate0:amd64 libsamplerate0:i386 \
+       #     libvulkan1:amd64 libvulkan1:i386 \
+       #     libsndfile1:amd64 libsndfile1:i386 \
+       #     libsndio7.0:amd64 libsndio7.0:i386 \
+       #     libexif12:amd64 libexif12:i386 \
+       #     libflac8:amd64 libflac8:i386 \
+       #     libmpg123-0:amd64 libmpg123-0:i386 \
+       #     libpulse0:amd64 libpulse0:i386 \
+       #     libvkd3d1:amd64 libvkd3d1:i386 \
+       #     libvorbis0a:amd64 libvorbis0a:i386 \
+       #     libvorbisenc2:amd64 libvorbisenc2:i386 \
+       #     libavcodec58:amd64 libavcodec58:i386 \
+       #     libatomic1:amd64 libatomic1:i386 \
+       #     libx264-155:amd64 libx264-155:i386 \
+       #     libgl1-mesa-dri:amd64 libgl1-mesa-dri:i386 \
+       #     libllvm7:amd64 libllvm7:i386 \
+       #     iso-codes \
        ; \
     fi && \
     #--------------
