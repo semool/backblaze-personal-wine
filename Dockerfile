@@ -114,6 +114,8 @@ RUN \
     sed -i s"/<file>\/var\/lib\/openbox\/debian-menu.xml<\/file>//" $OBCONF && \
     # Set openbox theme
     sed -i s"/<name>Clearlooks<\/name>/<name>Afterpiece<\/name>/" $OBCONF && \
+    # Set Window Font
+    sed -i s"/<name>sans<\/name>/<name>Segoe UI<\/name>/" $OBCONF && \
     # Set openbox Titlebar Font Size
     sed -i s"/<size>8<\/size>/<size>10<\/size>/" $OBCONF && \
     # Disable openbox right click root menu
@@ -163,7 +165,6 @@ RUN \
                libatomic1:amd64 libatomic1:i386 \
                libx264-155:amd64 libx264-155:i386 \
                libsamplerate0:amd64 libsamplerate0:i386 \
-               libgnutls30:i386 \
        ; \
     fi && \
     #--------------
