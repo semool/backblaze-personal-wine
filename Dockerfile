@@ -15,9 +15,11 @@ RUN \
     #--------------
     # Get noVNC
     NOVNCPATH="/opt/noVNC" && \
+    NOVNCVERSION="1.3.0" && \
+    SOCKIFYVERSION="0.10.0" && \
     git config --global advice.detachedHead false && \
-    git clone https://github.com/novnc/noVNC --branch v1.3.0 $NOVNCPATH && \
-    git clone https://github.com/novnc/websockify --branch v0.10.0 $NOVNCPATH/utils/websockify && \
+    git clone https://github.com/novnc/noVNC --branch v$NOVNCVERSION $NOVNCPATH && \
+    git clone https://github.com/novnc/websockify --branch v$SOCKIFYVERSION $NOVNCPATH/utils/websockify && \
     ln -s $NOVNCPATH/vnc.html $NOVNCPATH/index.html && \
     sed -i s"/'autoconnect', false/'autoconnect', 'true'/" $NOVNCPATH/app/ui.js && \
     rm -r $NOVNCPATH/.git* $NOVNCPATH/utils/websockify/.git* && \
@@ -131,7 +133,7 @@ RUN \
     # Cleanup x86
     if [ "$ARCH" = "32" ]; then \
        # Workaround for fontconfig invalid cache files spam - BUG!
-       rm -R /usr/share/fonts/100dpi \
+       rm -r /usr/share/fonts/100dpi \
              /usr/share/fonts/75dpi \
              /usr/share/fonts/cyrillic \
              /usr/share/fonts/encodings \
@@ -144,11 +146,11 @@ RUN \
     #--------------
     # Cleanup x64
     if [ "$ARCH" = "64" ]; then \
-       rm -rf /var/lib/apt/lists/* \
-              /usr/share/doc && \
        apt-get autoremove -y && \
        apt-get clean && \
-       rm -rf /var/lib/apt/lists/* \
+       rm -rf /var/cache/fontconfig/* \
+             /var/lib/apt/lists/* \
+             /usr/share/doc \
        ; \
     fi && \
     #--------------

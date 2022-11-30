@@ -8,8 +8,7 @@ echo "Setting $GETARCH bit Path for Backblaze Client"
 if [ "$GETARCH" == "32" ]; then
    BZPATH="$WINEPREFIX/drive_c/Program Files/Backblaze/bzbui.exe"
    BZPATHROOT="$WINEPREFIX/drive_c/Program Files/Backblaze"
-fi
-if [ "$GETARCH" == "64" ]; then
+elif [ "$GETARCH" == "64" ]; then
    BZPATH="$WINEPREFIX/drive_c/Program Files (x86)/Backblaze/bzbui.exe"
 fi
 echo "************************************"
@@ -32,8 +31,7 @@ echo "************************************"
 echo "Setting Language to: $LANG"
 if [ "$GETARCH" == "32" ]; then
    export LANG=$LANG
-fi
-if [ "$GETARCH" == "64" ]; then
+elif [ "$GETARCH" == "64" ]; then
    localedef -i `echo $LANG | cut -d "." -f1` -c -f UTF-8 -A /usr/share/locale/locale.alias $LANG
    export LANG=$LANG
    export LANGUAGE=$LANG
