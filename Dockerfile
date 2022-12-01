@@ -66,7 +66,7 @@ RUN \
        apk --update --upgrade --no-cache add \
        wine xvfb x11vnc openbox samba-winbind-clients tzdata musl-locales \
        # for noVNC
-       bash python3 procps \
+       bash python3 procps openssl \
        # numpy for noVNC - optional, not needed for this purpose
        #py3-numpy \
        #--------------
@@ -85,7 +85,7 @@ RUN \
        xvfb x11vnc openbox wget locales tzdata ca-certificates fonts-dejavu \
        #wine wine32 wine64 \
        # for noVNC
-       python3 procps \
+       python3 procps openssl \
        # numpy for noVNC - optional, not needed for this purpose
        #python3-numpy \
        -y \
@@ -182,6 +182,9 @@ EXPOSE 6080
 
 # VNC Password
 ENV VNCPASSWORD none
+
+# noVNC SSL
+ENV NOVNCSSL 0
 
 # redownload Client for update/reinstall
 ENV CLIENTUPDATE 0

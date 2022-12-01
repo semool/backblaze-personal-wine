@@ -69,6 +69,7 @@ docker run -d \
     -e LANG=de_DE.UTF-8 \
     -e COMPUTERNAME=pcname \ # <- Wine Computername
     -e VNCPASSWORD=password \
+    -e NOVNCSSL=1 \ # <- Look in the VNC Server Security Section
     -e DISPLAYSIZE=910x740 \ # <- The virtual Display Size
     -e CLIENTUPDATE=0 \ # <- Set this to 1 (2 for Beta Version) for Client Update/Reinstall
     -v backblaze_data:/wine \ #<- This can be a Docker Volume
@@ -92,13 +93,23 @@ To go through the setup process you must connect to the integrated vnc server.
 
 ### VNC Password
 You can set a password to secure the VNC Server by add ```-e VNCPASSWORD=yourpwd``` to the docker run command.
+The Password will be saved to ```/wine/.vncpassword```.
+When you set the Password back to 'none' the saved file will be deletet.
+In the same way you can change the Password, set to 'none', start/stop the Container and set a new Password.
 
 ### Security
 The server runs an unencrypted integrated VNC server.
 Make sure you dont accept Connections from outside your local Network.
 
+### Simple https
+You can set ```-e NOVNCSSL=1``` to the docker run command.
+Then the Container will create a Keyfile for https: ```/wine/.novnc.pem```.
+Optional you can replace it with your own compatible Keyfile.
+When ```-e NOVNCSSL=1``` is set you can only access the noVNC Webinterface with https.
+The normal VNC Server will not acceppt connections on Port 5900 now.
+
 ### https
-When you need access over the Internet you can use [NGINX Proxy Manager](https://github.com/NginxProxyManager/nginx-proxy-manager) to setup https for the noVNC Webinterface.
+When you need access over the Internet with legit Certificates (Lets Encrypt) you can use [NGINX Proxy Manager](https://github.com/NginxProxyManager/nginx-proxy-manager) to setup https for the noVNC Webinterface.
 Optional you can disable the VNC Port expose:
 * comment the ```EXPOSE 5900``` in the Dockerfile before you build your Image to only allow Connections to the noVNC Webinterface.
 * or you can modify the Port Mapping in your run command: ```-p 127.0.0.1:5900:5900```

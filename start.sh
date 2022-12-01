@@ -39,22 +39,43 @@ fi
 echo "************************************"
 
 if [ "$VNCPASSWORD" != "none" ]; then
-   echo "Setting the VNC Server Password: $VNCPASSWORD"
-   if [ ! -e "/root/.vnc" ]; then mkdir /root/.vnc; fi
-   x11vnc -storepasswd $VNCPASSWORD /root/.vnc/passwd &>/dev/null
-   VNCAUTH="-rfbauth /root/.vnc/passwd"
+   if [ ! -e "$WINEPREFIX/.vncpassword" ]; then
+      echo "Setting the VNC Server Password: $WINEPREFIX/.vncpassword"
+      x11vnc -storepasswd $VNCPASSWORD $WINEPREFIX/.vncpassword &>/dev/null
+   else
+      echo "VNC Server Password File exist"
+   fi
+   VNCAUTH="-rfbauth $WINEPREFIX/.vncpassword"
    echo "************************************"
 else
+   if [ -e "$WINEPREFIX/.vncpassword" ]; then rm $WINEPREFIX/.vncpassword; fi
    VNCAUTH="-nopw"
 fi
 
 echo "Starting the VNC Server on Port: 5900"
+LOCALONLY=""
+if [ "$NOVNCSSL" != "0" ]; then
+   echo "SSL is active, dont accept direct connections"
+   LOCALONLY="-localhost"
+fi
 rm -f /tmp/.X0-lock
-Xvfb $DISPLAY -screen 0 "$DISPLAYSIZE"x24 & openbox & x11vnc $VNCAUTH -q -forever -loop -shared &>/dev/null &
+Xvfb $DISPLAY -screen 0 "$DISPLAYSIZE"x24 & openbox & x11vnc $LOCALONLY $VNCAUTH -q -forever -loop -shared &>/dev/null &
 echo "************************************"
 
-echo "Starting the noVNC Webinterface on Port: 6080"
-/opt/noVNC/utils/novnc_proxy --vnc :5900 &>/dev/null &
+if [ "$NOVNCSSL" != "0" ]; then
+   echo "Starting the noVNC Webinterface on Port: 6080 (https only)"
+   if [ ! -e "$WINEPREFIX/.novnc.pem" ]; then
+      echo "Create noVNC self sign certificate: $WINEPREFIX/.novnc.pem"
+      openssl req -x509 -nodes -newkey rsa:2048 -keyout $WINEPREFIX/.novnc.pem -out $WINEPREFIX/.novnc.pem -days 365 \
+      -subj "/C=/ST=/L=/O=Backblaze Docker noVNC/OU=Backblaze Docker noVNC/CN=Backblaze Docker noVNC" &>/dev/null
+   fi
+   NOVNCCERT="--cert $WINEPREFIX/.novnc.pem --ssl-only --vnc :5900"
+else
+   echo "Starting the noVNC Webinterface on Port: 6080"
+   if [ -e "$WINEPREFIX/.novnc.pem" ]; then rm $WINEPREFIX/.novnc.pem; fi
+   NOVNCCERT="--vnc :5900"
+fi
+/opt/noVNC/utils/novnc_proxy $NOVNCCERT &>/dev/null &
 echo "************************************"
 
 function configure_wine {
