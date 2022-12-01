@@ -16,7 +16,7 @@ Please note, Linux specific file attributes (like ownership, acls or permissions
 * Disable openbox right click root menu (not needed)
 * Install a dark [Theme (Afterpiece)](https://github.com/terroo/openbox-themes/tree/main/Afterpiece) for Openbox
 * Adding Font [segoe-ui-linux](https://github.com/mrbvrz/segoe-ui-linux) for the Gui instead of ttf-dejavu
-* Adding [noVNC](https://github.com/novnc/noVNC) Webinterface
+* Adding [noVNC](https://github.com/novnc/noVNC) Webinterface with optional https Support
 * Adding Backblaze noVNC Icons
 * Making the virtual Display Size configurable (Default: 910x740)
 * Adding ENV to initiate a Client Redownload/Update
