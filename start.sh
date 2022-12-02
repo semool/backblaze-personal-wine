@@ -2,31 +2,12 @@
 
 GETARCH=`getconf LONG_BIT`
 echo "Detected Arch: $GETARCH bit"
-echo "************************************"
-
-echo "Setting $GETARCH bit Path for Backblaze Client"
-if [ "$GETARCH" == "32" ]; then
-   BZPATH="$WINEPREFIX/drive_c/Program Files/Backblaze/bzbui.exe"
-   BZPATHROOT="$WINEPREFIX/drive_c/Program Files/Backblaze"
-elif [ "$GETARCH" == "64" ]; then
-   BZPATH="$WINEPREFIX/drive_c/Program Files (x86)/Backblaze/bzbui.exe"
-fi
-echo "************************************"
-
-if [ "$CLIENTUPDATE" != "0" -a -e "$WINEPREFIX/drive_c/" ]; then
-   echo "Client Update Mode ON!"
-   touch $WINEPREFIX/drive_c/.CLIENTUPDATE
-   if [ "$CLIENTUPDATE" == "2" ]; then
-      echo "Client Update Mode for BETA VERSION!!"
-      touch $WINEPREFIX/drive_c/.CLIENTUPDATEBETA
-   fi
-   echo "************************************"
-fi
+echo "---------------------------------------------------"
 
 echo $TZ > /etc/timezone
 echo "Setting Timezone to: $TZ"
 date
-echo "************************************"
+echo "---------------------------------------------------"
 
 echo "Setting Language to: $LANG"
 if [ "$GETARCH" == "32" ]; then
@@ -36,7 +17,22 @@ elif [ "$GETARCH" == "64" ]; then
    export LANG=$LANG
    export LANGUAGE=$LANG
 fi
-echo "************************************"
+echo "---------------------------------------------------"
+
+echo "Setting $GETARCH bit Path for Backblaze Installation"
+if [ "$GETARCH" == "32" ]; then
+   BZPATH="$WINEPREFIX/drive_c/Program Files/Backblaze/bzbui.exe"
+   BZPATHROOT="$WINEPREFIX/drive_c/Program Files/Backblaze"
+elif [ "$GETARCH" == "64" ]; then
+   BZPATH="$WINEPREFIX/drive_c/Program Files (x86)/Backblaze/bzbui.exe"
+fi
+echo "---------------------------------------------------"
+
+if [ "$CLIENTUPDATE" != "0" -a -e "$WINEPREFIX/drive_c/" ]; then
+   if [ "$CLIENTUPDATE" == "1" ]; then echo "Client Update Mode ON!"; fi
+   if [ "$CLIENTUPDATE" == "2" ]; then echo "Client Update Mode for BETA VERSION!!"; fi
+   echo "---------------------------------------------------"
+fi
 
 if [ "$VNCPASSWORD" != "none" ]; then
    if [ ! -e "$WINEPREFIX/.vncpassword" ]; then
@@ -46,7 +42,7 @@ if [ "$VNCPASSWORD" != "none" ]; then
       echo "VNC Server Password File exist"
    fi
    VNCAUTH="-rfbauth $WINEPREFIX/.vncpassword"
-   echo "************************************"
+   echo "---------------------------------------------------"
 else
    if [ -e "$WINEPREFIX/.vncpassword" -a "$VNCPASSWORD" != "save" ]; then rm $WINEPREFIX/.vncpassword; fi
    VNCAUTH="-nopw"
@@ -60,10 +56,11 @@ if [ "$NOVNCSSL" != "0" ]; then
 fi
 rm -f /tmp/.X0-lock
 Xvfb $DISPLAY -screen 0 "$DISPLAYSIZE"x24 & openbox & x11vnc $LOCALONLY $VNCAUTH -q -forever -loop -shared &>/dev/null &
-echo "************************************"
+echo "---------------------------------------------------"
 
 if [ "$NOVNCSSL" != "0" ]; then
-   echo "Starting the noVNC Webinterface on Port: 6080 (https only)"
+   echo "Starting the noVNC Webinterface (SSL) on Port: 6080"
+   echo "Goto: https://$HOSTNAME:6080"
    if [ ! -e "$WINEPREFIX/.novnc.pem" ]; then
       echo "Create noVNC self sign certificate: $WINEPREFIX/.novnc.pem"
       openssl req -x509 -nodes -newkey rsa:2048 -keyout $WINEPREFIX/.novnc.pem -out $WINEPREFIX/.novnc.pem -days 365 \
@@ -72,11 +69,12 @@ if [ "$NOVNCSSL" != "0" ]; then
    NOVNCCERT="--cert $WINEPREFIX/.novnc.pem --ssl-only --vnc :5900"
 else
    echo "Starting the noVNC Webinterface on Port: 6080"
+   echo "Goto: http://$HOSTNAME:6080"
    if [ -e "$WINEPREFIX/.novnc.pem" ]; then rm $WINEPREFIX/.novnc.pem; fi
    NOVNCCERT="--vnc :5900"
 fi
 /opt/noVNC/utils/novnc_proxy $NOVNCCERT &>/dev/null &
-echo "************************************"
+echo "---------------------------------------------------"
 
 function configure_wine {
   echo "Configure Wine..."
@@ -91,7 +89,8 @@ function configure_wine {
 
   echo "Setting Wine Registry Entries:"
   if [ ${#COMPUTER_NAME} -gt 15 ]; then
-    echo "Error: computer name cannot be longer than 15 characters"
+    echo "Error: computer name cannot be longer than 15 characters!"
+    echo "Execution stopped!"
     exit 1
   fi
   echo "- Setting Computer Name: $COMPUTERNAME"
@@ -109,37 +108,28 @@ function configure_wine {
      echo "- Disable the Debugger"
      wine reg delete "HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AeDebug" /f &>/dev/null
   fi
-  echo "************************************"
+  echo "---------------------------------------------------"
 }
 
 function rename_x64 {
-  if [ -e "$BZPATHROOT/x64" -o -e "$BZPATHROOT/bzfilelist64.exe" -o -e "$BZPATHROOT/bztransmit64.exe" ]; then
-     echo "Try to renaming x64 Binaries (we are running x86 only in this Container)!"
-     echo "Without renaming them the Client try continusly starting them and wine will go in Debug Mode = High CPU Load!"
-     echo "When a Message Pops up with 'Client is not installed correctly' ignore it and click in the main Client Window to hide the Warning in the background"
-     echo "The Client will run fine!"
-     echo "************************************"
-  fi
-  if [ -e "$BZPATHROOT/x64" ]; then
-     if [ -e "$BZPATHROOT/x64-DISABLED" ]; then
-        rm -rf "$BZPATHROOT/x64-DISABLED"
+  if [ -e "$BZPATHROOT/x64" -o -f "$BZPATHROOT/bzfilelist64.exe" -o -f "$BZPATHROOT/bztransmit64.exe" ]; then
+     echo "Renaming x64 Binaries"
+     if [ -e "$BZPATHROOT/x64" ]; then
+        if [ -e "$BZPATHROOT/x64-DISABLED" ]; then rm -rf "$BZPATHROOT/x64-DISABLED"; fi
+        mv -f "$BZPATHROOT/x64" "$BZPATHROOT/x64-DISABLED"
      fi
-     mv -f "$BZPATHROOT/x64" "$BZPATHROOT/x64-DISABLED"
-  fi
-  if [ -e "$BZPATHROOT/bzfilelist64.exe" ]; then
-     mv -f "$BZPATHROOT/bzfilelist64.exe" "$BZPATHROOT/bzfilelist64.exe-DISABLED"
-  fi
-  if [ -e "$BZPATHROOT/bztransmit64.exe" ]; then
-     mv -f "$BZPATHROOT/bztransmit64.exe" "$BZPATHROOT/bztransmit64.exe-DISABLED"
+     if [ -e "$BZPATHROOT/bzfilelist64.exe" ]; then mv -f "$BZPATHROOT/bzfilelist64.exe" "$BZPATHROOT/bzfilelist64.exe-DISABLED"; fi
+     if [ -e "$BZPATHROOT/bztransmit64.exe" ]; then mv -f "$BZPATHROOT/bztransmit64.exe" "$BZPATHROOT/bztransmit64.exe-DISABLED"; fi
+     echo "---------------------------------------------------"
   fi
 }
 
 function install_backblaze {
   echo "Backblaze installer started, please go through the graphical setup by logging onto the containers (no)VNC server"
   wine $WINEPREFIX/drive_c/install_backblaze.exe
-  echo "************************************"
+  echo "---------------------------------------------------"
   echo "Installation finished or aborted! Lets check..."
-  echo "************************************"
+  echo "---------------------------------------------------"
   if [ "$GETARCH" == "32" ]; then rename_x64; fi
   echo "Trying to start the Backblaze client..."
   wineserver -k
@@ -148,38 +138,33 @@ function install_backblaze {
 until [ -f "$BZPATH" ]; do
   echo "Backblaze not installed - Initializing the wine prefix..."
   wineboot -i -u
-  echo "************************************"
+  echo "---------------------------------------------------"
   configure_wine
   if [ ! -e $WINEPREFIX/drive_c/install_backblaze.exe ]; then
      echo "Downloading the Backblaze personal installer..."
      wget -O $WINEPREFIX/drive_c/install_backblaze.exe https://secure.backblaze.com/api/install_backblaze?file=bzinstall-win32-8.5.0.627.exe
-     sleep 2
-     echo "************************************"
+     echo "---------------------------------------------------"
   fi
   install_backblaze
 done
 
-if [ -e $WINEPREFIX/drive_c/.CLIENTUPDATE ]; then
+if [ "$CLIENTUPDATE" != "0" ]; then
   configure_wine
-  echo "Update Mode! Downloading the newest Client and starting install..."
+  echo "Starting Client Update Mode..."
   DATE=$(date '+%Y-%m-%d-%H.%M')
   if [ -e $WINEPREFIX/drive_c/install_backblaze.exe ]; then
     echo "Renaming old Installer to: $WINEPREFIX/drive_c/install_backblaze.exe_$DATE"
     mv -f $WINEPREFIX/drive_c/install_backblaze.exe $WINEPREFIX/drive_c/install_backblaze.exe_$DATE
   fi
-  echo "************************************"
-  if [ -e $WINEPREFIX/drive_c/.CLIENTUPDATEBETA ]; then
+  if [ "$CLIENTUPDATE" == "1" ]; then
+    echo "Downloading the Backblaze personal latest Final installer..."
+    wget https://www.backblaze.com/win32/install_backblaze.exe -P $WINEPREFIX/drive_c/
+  elif [ "$CLIENTUPDATE" == "2" ]; then
     echo "Downloading the Backblaze personal BETA installer..."
     wget https://f000.backblazeb2.com/file/backblazefiles/install_backblaze.exe -P $WINEPREFIX/drive_c/
-  else
-    echo "Downloading the Backblaze personal installer..."
-    wget https://www.backblaze.com/win32/install_backblaze.exe -P $WINEPREFIX/drive_c/
   fi
-  sleep 2
   CLIENTUPDATE=0
-  rm -f $WINEPREFIX/drive_c/.CLIENTUPDATE
-  if [ -e $WINEPREFIX/drive_c/.CLIENTUPDATEBETA ]; then rm -f $WINEPREFIX/drive_c/.CLIENTUPDATEBETA; fi
-  echo "************************************"
+  echo "---------------------------------------------------"
   install_backblaze
 fi
 

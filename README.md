@@ -169,6 +169,10 @@ When you restart the complete Container set 'CLIENTUPDATE' back to 0.
 <details>
   <summary>Click to expand!</summary>
 
+### Get the Container Logfile:
+```
+docker logs -f backblaze
+```
 ### Open a bash Shell for the Container:
 ```
 docker exec -it backblaze bash
