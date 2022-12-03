@@ -28,12 +28,6 @@ elif [ "$GETARCH" == "64" ]; then
 fi
 echo "---------------------------------------------------"
 
-if [ "$CLIENTUPDATE" != "0" -a -e "$WINEPREFIX/drive_c/" ]; then
-   if [ "$CLIENTUPDATE" == "1" ]; then echo "Client Update Mode ON!"; fi
-   if [ "$CLIENTUPDATE" == "2" ]; then echo "Client Update Mode for BETA VERSION!!"; fi
-   echo "---------------------------------------------------"
-fi
-
 if [ "$VNCPASSWORD" != "none" ]; then
    if [ ! -e "$WINEPREFIX/.vncpassword" ]; then
       echo "Setting the VNC Server Password: $WINEPREFIX/.vncpassword"
@@ -150,7 +144,8 @@ done
 
 if [ "$CLIENTUPDATE" != "0" ]; then
   configure_wine
-  echo "Starting Client Update Mode..."
+  if [ "$CLIENTUPDATE" == "1" ]; then echo "Client Update Mode ON!"; fi
+  if [ "$CLIENTUPDATE" == "2" ]; then echo "Client Update Mode ON for BETA VERSION!"; fi
   DATE=$(date '+%Y-%m-%d-%H.%M')
   if [ -e $WINEPREFIX/drive_c/install_backblaze.exe ]; then
     echo "Renaming old Installer to: $WINEPREFIX/drive_c/install_backblaze.exe_$DATE"

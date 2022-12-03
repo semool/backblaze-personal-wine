@@ -199,7 +199,7 @@ ENV WINEDEBUG -all
 ENV WINEDLLOVERRIDES mscoree,mshtml=
 
 # Set the wine computer name
-ENV COMPUTERNAME bz-docker
+ENV COMPUTERNAME backblaze
 
 # Healthcheck for Client GUI
 HEALTHCHECK CMD pidof bzserv.exe >/dev/null || exit 1
