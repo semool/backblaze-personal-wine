@@ -94,7 +94,7 @@ To go through the setup process you must connect to the integrated vnc server.
 ### VNC Password
 You can set a password to secure the VNC Server by add ```-e VNCPASSWORD=yourpwd``` to the docker run command.
 The Password will be saved to ```/wine/.vncpassword```.
-For extra Security you can now change ```-e VNCPASSWORD=yourpwd``` to ```-e VNCPASSWORD=save```.
+For extra Security you can now change ```-e VNCPASSWORD=yourpwd``` to ```-e VNCPASSWORD=anything ,but not to 'none'```.
 The encryptet ```/wine/.vncpassword``` will continue to be used.
 When you set the Password back to 'none' the saved file will be deletet.
 In the same way you can change the Password, set to 'none', start/stop the Container and set a new Password.

@@ -44,7 +44,7 @@ if [ "$VNCPASSWORD" != "none" ]; then
    VNCAUTH="-rfbauth $WINEPREFIX/.vncpassword"
    echo "---------------------------------------------------"
 else
-   if [ -e "$WINEPREFIX/.vncpassword" -a "$VNCPASSWORD" != "save" ]; then rm $WINEPREFIX/.vncpassword; fi
+   if [ -e "$WINEPREFIX/.vncpassword" ]; then rm $WINEPREFIX/.vncpassword; fi
    VNCAUTH="-nopw"
 fi
 
