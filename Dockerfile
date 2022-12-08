@@ -82,7 +82,8 @@ RUN \
        apt-get update && \
        apt-get upgrade -y && \
        apt-get --no-install-recommends install \
-       xvfb x11vnc openbox wget locales tzdata ca-certificates fonts-dejavu \
+       xvfb x11vnc openbox wget locales tzdata ca-certificates \
+       fonts-dejavu fonts-liberation fonts-wine \
        #wine wine32 wine64 \
        # for noVNC
        python3 procps openssl \
