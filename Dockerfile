@@ -4,14 +4,14 @@ FROM i386/alpine:3.13.12 AS builder
 # Create Builder Image
 RUN \
     # Install required packages
-    apk --update --no-cache --virtual add imagemagick git && \
+    apk --update --no-cache --virtual .build-deps add \
+    imagemagick git && \
     #--------------
     # Get segoe-ui-linux Font
     FONTPATH=/usr/share/fonts/Microsoft/TrueType/SegoeUI && \
     mkdir -p $FONTPATH && \
     FONTFILES="segoeui segoeuib segoeuii segoeuiz segoeuil seguili segoeuisl seguisli seguisb seguisbi" && \
     for f in $FONTFILES; do wget -O $FONTPATH/$f.ttf https://raw.githubusercontent.com/mrbvrz/segoe-ui/master/font/$f.ttf; done && \
-    #fc-cache -f $FONTPATH && \
     #--------------
     # Get noVNC
     NOVNCPATH="/opt/noVNC" && \
@@ -22,7 +22,6 @@ RUN \
     git clone https://github.com/novnc/websockify --branch v$SOCKIFYVERSION $NOVNCPATH/utils/websockify && \
     ln -s $NOVNCPATH/vnc.html $NOVNCPATH/index.html && \
     sed -i s"/'autoconnect', false/'autoconnect', 'true'/" $NOVNCPATH/app/ui.js && \
-    rm -r $NOVNCPATH/.git* $NOVNCPATH/utils/websockify/.git* && \
     #--------------
     # Replace noVNC Icons
     wget -O logo.png https://www.backblaze.com/blog/wp-content/uploads/2017/12/backblaze_icon_transparent.png && \
@@ -31,7 +30,12 @@ RUN \
     for i in $ICONSIZE; do convert -resize $i logo.png $NOVNCPATH/app/images/icons/novnc-$i.png; done && \
     #--------------
     # Get openbox themes
-    git clone https://github.com/terroo/openbox-themes
+    git clone https://github.com/terroo/openbox-themes && \
+    #--------------
+    # Cleanup
+    apk del .build-deps && \
+    rm -r $NOVNCPATH/.git* $NOVNCPATH/utils/websockify/.git* && \
+    rm logo.png
     #--------------
 
 FROM $BASEIMAGE
