@@ -185,6 +185,12 @@ docker exec backblaze wine explorer &
 ```
 docker exec backblaze wine registry &
 ```
+### Getting access to the Wine Console (cmd like):
+```
+docker exec backblaze wine wineconsole &
+## Checking if the Dir is detected as link or mount (then it will not Backuped)
+"C:\Program Files\Backblaze\bzfilelist.exe" -fileinfo D:\MyBackupDir
+```
 ### Getting access to the Wine Config Window:
 ```
 docker exec backblaze wine winecfg &
