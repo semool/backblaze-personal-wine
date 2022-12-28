@@ -72,13 +72,41 @@ echo "---------------------------------------------------"
 
 function configure_wine {
   echo "Configure Wine..."
+
   if [ -e $WINEPREFIX/dosdevices/z: ]; then
      echo "- Unlink $WINEPREFIX/dosdevices/z:"
      unlink $WINEPREFIX/dosdevices/z:
   fi
-  if [ ! -e $WINEPREFIX/dosdevices/d: ]; then
-     echo "- Link /data/ -> $WINEPREFIX/dosdevices/d:"
-     ln -s /data/ $WINEPREFIX/dosdevices/d:
+
+  if [ "$MOUNTEXPERT" == "0" ]; then
+     if [ ! -e $WINEPREFIX/dosdevices/d: ]; then
+        echo "- Link /data/ -> $WINEPREFIX/dosdevices/d:"
+        ln -s /data/ $WINEPREFIX/dosdevices/d:
+     fi
+  else
+     for n in /data/*; do
+        b="$(basename "$n")"
+        d="${b//__*/}"
+        if ! [[ $d =~ ^[d-y]$ ]]; then
+           echo "- Invalid Directory Name: $d"
+           echo "  Should be: <letter d-y>__$d"
+           continue
+        fi
+
+        if [ -L "$WINEPREFIX/dosdevices/$d:" ]; then
+           checkl="$(readlink $WINEPREFIX/dosdevices/$d:)"
+           if [ "$checkl" == "$n" ]; then
+              echo "- Link already exist: $n -> $d:"
+              continue
+           else
+              echo "- Unlink old $checkl -> $d:"
+              unlink $WINEPREFIX/dosdevices/$d:
+           fi
+        fi
+
+        echo "- Link $n -> $d:"
+        ln -s $n $WINEPREFIX/dosdevices/$d:
+     done
   fi
 
   echo "Setting Wine Registry Entries:"

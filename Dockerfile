@@ -191,6 +191,9 @@ ENV VNCPASSWORD none
 # noVNC SSL
 ENV NOVNCSSL 0
 
+# Expert Mount Modus
+MOUNTEXPERT 0
+
 # redownload Client for update/reinstall
 ENV CLIENTUPDATE 0
 

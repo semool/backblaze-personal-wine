@@ -74,12 +74,12 @@ docker run -d \
     -e COMPUTERNAME=pcname \ # <- Wine Computername
     -e VNCPASSWORD=password \
     -e NOVNCSSL=1 \ # <- Look in the VNC Server Security Section
+    -e MOUNTEXPERT=1 \ # Every single dir/mount under Data will be a seperate Backup drive (look at 'Data Dir Tips')
     -e DISPLAYSIZE=910x740 \ # <- The virtual Display Size
     -e CLIENTUPDATE=0 \ # <- Set this to 1 (2 for Beta Version) for Client Update/Reinstall
     -v backblaze_data:/wine \ #<- This can be a Docker Volume
-    -v /mnt/backblaze-temp:/data \ #<- This must be a Folder that is big enough to save the bigest file from your Backup (look at 'Data Dir Tips')
-    -v /mnt/backupfolder1:/data/backupfolder1 \ #<- A Folder that should be Backuped
-    -v /mnt/backupfolder2:/data/backupfolder2 \ #<- A Folder that should be Backuped
+    -v /mnt/backupfolder1:/data/d__backupfolder1 \ #<- A Folder that should be Backuped, first Part is the Drive Letter to mount
+    -v /mnt/backupfolder2:/data/e__backupfolder2 \ #<- A Folder that should be Backuped, first Part is the Drive Letter to mount
     --name=backblaze \
     --restart=always \
     backblaze-personal-wine:x86.alpine # <- or x64.debian
@@ -126,10 +126,15 @@ Optional you can disable the VNC Port expose:
   <summary>Click to expand!</summary>
 
 ### Step 1: DATA Dir Tips
-Mount a very Big empty Folder directly to '/data' first. It must have free Space for the bigest File you will Backup.
+* Normal Mode (Default):
+Mount a very Big empty Folder directly to '/data' first. This is your Drive D: root and must be 'rw'. It must have free Space for the bigest File you will Backup.
 The Client uploads big files in Chunks (10MB) and they are temporarily saved here.
 Also a directory '.bzvol' will create here. The Files inside are unique and needed for the client to redetect this as D: Drive.
-Now you can mount all your Folders for Backup inside. you can remove or add Folders at any time (Look in the 'Docker run Example').
+Now you can mount all your Folders for Backup inside. They can be 'ro'. You can remove or add Folders at any time (Look in the 'Docker run Example').
+
+* Expert Mode:
+When you set ```-e MOUNTEXPERT=1``` every single mount in /data becomes a own Driveletter (Look in the 'Docker run Advanced Example').
+The '.bzvol' will create in every single mounted dir. So they must be 'rw'.
 
 ### Step 2: Installation
 When starting the container for the first time, it will automatically initialize a new Wine prefix and download & run the backblaze installer.
