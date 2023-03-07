@@ -164,7 +164,7 @@ until [ -f "$BZPATH" ]; do
   configure_wine
   if [ ! -e $WINEPREFIX/drive_c/install_backblaze.exe ]; then
      echo "Downloading the Backblaze personal installer..."
-     wget -O $WINEPREFIX/drive_c/install_backblaze.exe https://secure.backblaze.com/api/install_backblaze?file=bzinstall-win32-8.5.0.627.exe
+     wget -O $WINEPREFIX/drive_c/install_backblaze.exe https://secure.backblaze.com/api/install_backblaze?file=bzinstall-win32-8.5.0.659.exe
      echo "---------------------------------------------------"
   fi
   install_backblaze
@@ -193,6 +193,7 @@ fi
 
 if [ -f "$BZPATH" ]; then
   configure_wine
+  if [ "$GETARCH" == "32" ]; then rename_x64; fi
   echo "Backblaze found, starting the Backblaze client..."
   wine "$BZPATH" -noquiet
   sleep infinity
