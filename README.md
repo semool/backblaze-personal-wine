@@ -147,9 +147,12 @@ Or you can move the Window around a little bit, that fixed the view.
 Then enter your password and hit "Install", the installer will start scanning your drive.
 
 * For x86 Image: After Backblaze Client Installation ALL x64 Binaries are get renamed while this is a i386 only Container. Without renaming them the Client try continusly starting them and wine will go in Debug Mode = High CPU Load! When a Message Pops up with Client is not installed correctly ignore it and click in the main Client Window to hide the Warning in the background. Client will run fine!
-* For X64 Image: When you become a Popup at Client Start 'ERR_NotificationDialog_bad_bzdata_permissions', ignore it and place it behind the Main Client Window. Eventually this is a Message that says you to enable Windows Location Services.
+* For X64 Image: When you become a Popup at Client Start 'ERR_NotificationDialog_bad_bzdata_permissions', ignore it and place it behind the Main Client Window. In newer Versions this String is translated and say you must check Permissions for the bzdata dir. This can be also ignored.
 
-### Step 3: Configuration
+### Step 3: Troubleshooting:
+Sometimes the Main Gui will start with ? instead of Text and crash after some seconds. The File Transfer in the background works great. When this happens reopen the Main Gui by Clicking on the Icon in the Tray Application. After 2-3 Attemps the Gui starts fine and will running.
+
+### Step 4: Configuration
 Once the Installer is finished the backblaze client should open automatically.
 
 You will notice that currently only around 10 files are backed up. 
@@ -166,7 +169,7 @@ If you have to stop the container during the initial backup the backup will cont
 
 Backblaze is now configured to automatically backup your linux files,  to check the progress or change settings use the VNC Server.
 
-### Step 4: Client Update
+### Step 5: Client Update
 To reinstall/update the Client start the Container with ```-e CLIENTUPDATE=1```
 With ```-e CLIENTUPDATE=2``` the latest Beta Version will be downloaded.
 The old Installer will be renamed and then the actual one will be downloaded.
