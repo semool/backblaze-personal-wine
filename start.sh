@@ -195,6 +195,6 @@ if [ -f "$BZPATH" ]; then
   configure_wine
   if [ "$GETARCH" == "32" ]; then rename_x64; fi
   echo "Backblaze found, starting the Backblaze client..."
-  wine "$BZPATH"
+  wine "$BZPATH" &
   sleep infinity
 fi
