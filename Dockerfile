@@ -5,37 +5,34 @@ FROM i386/alpine:3.13.12 AS builder
 RUN \
     # Install required packages
     apk --update --no-cache --virtual .build-deps add \
-    imagemagick git && \
+    git && \
     #--------------
     # Get segoe-ui-linux Font
     FONTPATH=/usr/share/fonts/Microsoft/TrueType/SegoeUI && \
     mkdir -p $FONTPATH && \
     FONTFILES="segoeui segoeuib segoeuii segoeuiz segoeuil seguili segoeuisl seguisli seguisb seguisbi" && \
-    for f in $FONTFILES; do wget -O $FONTPATH/$f.ttf https://raw.githubusercontent.com/mrbvrz/segoe-ui/master/font/$f.ttf; done && \
+    for f in $FONTFILES; do wget --no-check-certificate -O $FONTPATH/$f.ttf https://raw.githubusercontent.com/mrbvrz/segoe-ui/master/font/$f.ttf; done && \
     #--------------
     # Get noVNC
     NOVNCPATH="/opt/noVNC" && \
-    NOVNCVERSION="1.3.0" && \
-    SOCKIFYVERSION="0.10.0" && \
+    NOVNCVERSION="1.4.0" && \
+    SOCKIFYVERSION="0.11.0" && \
     git config --global advice.detachedHead false && \
     git clone https://github.com/novnc/noVNC --branch v$NOVNCVERSION $NOVNCPATH && \
     git clone https://github.com/novnc/websockify --branch v$SOCKIFYVERSION $NOVNCPATH/utils/websockify && \
     ln -s $NOVNCPATH/vnc.html $NOVNCPATH/index.html && \
     sed -i s"/'autoconnect', false/'autoconnect', 'true'/" $NOVNCPATH/app/ui.js && \
     #--------------
-    # Replace noVNC Icons
-    wget -O logo.png https://www.backblaze.com/blog/wp-content/uploads/2017/12/backblaze_icon_transparent.png && \
-    rm $NOVNCPATH/app/images/icons/novnc-*.png && \
-    ICONSIZE="192x192 152x152 144x144 120x120 96x96 76x76 72x72 64x64 60x60 48x48 32x32 24x24 16x16" && \
-    for i in $ICONSIZE; do convert -resize $i logo.png $NOVNCPATH/app/images/icons/novnc-$i.png; done && \
+    # Replace noVNC Favicon
+    rm $NOVNCPATH/app/images/icons/novnc.ico && \
+    wget --no-check-certificate -O $NOVNCPATH/app/images/icons/novnc.ico https://www.backblaze.com/favicon.ico && \
     #--------------
     # Get openbox themes
     git clone https://github.com/terroo/openbox-themes && \
     #--------------
     # Cleanup
     apk del .build-deps && \
-    rm -r $NOVNCPATH/.git* $NOVNCPATH/utils/websockify/.git* && \
-    rm logo.png
+    rm -r $NOVNCPATH/.git* $NOVNCPATH/utils/websockify/.git*
     #--------------
 
 FROM $BASEIMAGE
@@ -101,8 +98,8 @@ RUN \
        WINEBRANCH="stable" && \
        WINEVERSION="4.0.4~$DISTROVERSION" && \
        mkdir -p /etc/apt/keyrings && \
-       wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key && \
-       wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/$DISTRO/dists/$WINEDISTRO/winehq-$WINEDISTRO.sources && \
+       wget --no-check-certificate -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key && \
+       wget --no-check-certificate -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/$DISTRO/dists/$WINEDISTRO/winehq-$WINEDISTRO.sources && \
        apt-get update && \
        apt-get --no-install-recommends install \
        winehq-$WINEBRANCH=$WINEVERSION \
@@ -160,7 +157,7 @@ RUN \
     fi && \
     #--------------
     # get start.sh direct from Github
-    wget https://raw.githubusercontent.com/semool/backblaze-personal-wine/master/start.sh && \
+    wget --no-check-certificate https://raw.githubusercontent.com/semool/backblaze-personal-wine/master/start.sh && \
     chmod 755 start.sh
     #--------------
 
