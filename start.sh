@@ -21,10 +21,14 @@ echo "---------------------------------------------------"
 
 echo "Setting $GETARCH bit Path for Backblaze Installation"
 if [ "$GETARCH" == "32" ]; then
-   BZPATH="$WINEPREFIX/drive_c/Program Files/Backblaze/bzbui.exe"
    BZPATHROOT="$WINEPREFIX/drive_c/Program Files/Backblaze"
+   BZPATHUI="$WINEPREFIX/drive_c/Program Files/Backblaze/bzbui.exe"
+   RUNTRAY="C:\Program Files\Backblaze\bzbuitray.exe"
+   RUNUI="C:\Program Files\Backblaze\bzbui.exe"
 elif [ "$GETARCH" == "64" ]; then
-   BZPATH="$WINEPREFIX/drive_c/Program Files (x86)/Backblaze/bzbui.exe"
+   BZPATHUI="$WINEPREFIX/drive_c/Program Files (x86)/Backblaze/bzbui.exe"
+   RUNTRAY="C:\Program Files (x86)\Backblaze\bzbuitray.exe"
+   RUNUI="C:\Program Files (x86)\Backblaze\bzbui.exe"
 fi
 echo "---------------------------------------------------"
 
@@ -157,7 +161,7 @@ function install_backblaze {
   wineserver -k
 }
 
-until [ -f "$BZPATH" ]; do
+until [ -f "$BZPATHUI" ]; do
   echo "Backblaze not installed - Initializing the wine prefix..."
   wineboot -i -u
   echo "---------------------------------------------------"
@@ -191,10 +195,15 @@ if [ "$CLIENTUPDATE" != "0" ]; then
   install_backblaze
 fi
 
-if [ -f "$BZPATH" ]; then
+if [ -f "$BZPATHUI" ]; then
   configure_wine
   if [ "$GETARCH" == "32" ]; then rename_x64; fi
-  echo "Backblaze found, starting the Backblaze client..."
-  wine "$BZPATH" &
+  echo "Backblaze found..."
+  echo "- Starting the Backblaze Tray Symbol"
+  wine "$RUNTRAY" &
+  echo "- Sleeping 10 Seconds..."
+  sleep 10
+  echo "- Starting the Backblaze client"
+  wine "$RUNUI" -noquiet &
   sleep infinity
 fi
