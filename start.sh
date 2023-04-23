@@ -203,7 +203,10 @@ if [ -f "$BZPATHUI" ]; then
   wine "$RUNTRAY" &
   echo "- Sleeping 10 Seconds..."
   sleep 10
-  echo "- Starting the Backblaze client"
-  wine "$RUNUI" -noquiet &
+  echo "- Starting the Backblaze client GUI"
+  echo "wine \"$RUNUI\" &" > startgui.sh
+  echo "exit" >> startgui.sh
+  chmod 755 startgui.sh
+  ./startgui.sh
   sleep infinity
 fi
