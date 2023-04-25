@@ -150,7 +150,8 @@ Then enter your password and hit "Install", the installer will start scanning yo
 * For X64 Image: When you become a Popup at Client Start 'ERR_NotificationDialog_bad_bzdata_permissions', ignore it and place it behind the Main Client Window. In newer Versions this String is translated and say you must check Permissions for the bzdata dir. This can be also ignored.
 
 ### Step 3: Troubleshooting:
-Sometimes the Main Gui will start with ? instead of Text and crash after some seconds. The File Transfer in the background works great. When this happens reopen the Main Gui by Clicking on the Icon in the Tray Application. After 2-3 Attemps the Gui starts fine and will running.
+~~Sometimes the Main Gui will start with ? instead of Text and crash after some seconds. The File Transfer in the background works great. When this happens reopen the Main Gui by Clicking on the Icon in the Tray Application. After 2-3 Attemps the Gui starts fine and will running.~~ <-- This should be fixed with the actual Images!
+
 When the Gui will crash or freeze open a Shell on the Docker Image and run `./startgui.sh`. Now the Gui will run forever. I dont know why.
 
 ### Step 4: Configuration
