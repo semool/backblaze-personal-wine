@@ -151,7 +151,7 @@ Then enter your password and hit "Install", the installer will start scanning yo
 
 ### Step 3: Troubleshooting:
 Sometimes the Main Gui will start with ? instead of Text and crash after some seconds. The File Transfer in the background works great. When this happens reopen the Main Gui by Clicking on the Icon in the Tray Application. After 2-3 Attemps the Gui starts fine and will running.
-When the Gui will crash more than one time open a Shell on the Docker Image and run `wine "C:\Program Files\Backblaze\bzbui.exe" &`. Now the Gui will run forever. I dont know why.
+When the Gui will crash more than one time open a Shell on the Docker Image and run `wine "C:\Program Files\Backblaze\bzbui.exe" &`. Or do it with docker exec (Look in 'Useful Docker commands'). Now the Gui will run forever. I dont know why.
 
 ### Step 4: Configuration
 Once the Installer is finished the backblaze client should open automatically.
@@ -182,6 +182,10 @@ When you restart the complete Container set 'CLIENTUPDATE' back to 0.
 <details>
   <summary>Click to expand!</summary>
 
+### Starting the Backblaze Gui after Crash:
+```
+docker exec -d backblaze wine "C:\Program Files\Backblaze\bzbui.exe"
+```
 ### Get the Container Logfile:
 ```
 docker logs -f backblaze
