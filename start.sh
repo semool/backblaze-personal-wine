@@ -198,11 +198,6 @@ fi
 if [ -f "$BZPATHUI" ]; then
   configure_wine
   if [ "$GETARCH" == "32" ]; then rename_x64; fi
-  echo "Backblaze found..."
-  echo "- Starting the Backblaze Tray Symbol"
-  wine "$RUNTRAY" &
-  echo "- Sleeping 10 Seconds..."
-  sleep 10
   echo "- Starting the Backblaze client GUI"
   wine "$RUNUI" -noquiet &
   sleep infinity
