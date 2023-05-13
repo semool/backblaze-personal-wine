@@ -76,7 +76,7 @@ docker run -d \
     -e NOVNCSSL=1 \ # <- Look in the VNC Server Security Section
     -e MOUNTEXPERT=1 \ # Every single dir/mount under Data will be a seperate Backup drive (look at 'Data Dir Tips')
     -e DISPLAYSIZE=910x740 \ # <- The virtual Display Size
-    -e CLIENTUPDATE=0 \ # <- Set this to 1 (2 for Beta Version) for Client Update/Reinstall
+    -e CLIENTUPDATE=0 \ # <- Set this to 1 (2 for Beta Version) for Client Update/Reinstall, 3 means you must manual place the install_backblaze.exe to drive C:
     -v backblaze_data:/wine \ #<- This can be a Docker Volume
     -v /mnt/backupfolder1:/data/d__backupfolder1 \ #<- A Folder that should be Backuped, first Part is the Drive Letter to mount
     -v /mnt/backupfolder2:/data/e__backupfolder2 \ #<- A Folder that should be Backuped, first Part is the Drive Letter to mount
@@ -174,6 +174,7 @@ Backblaze is now configured to automatically backup your linux files,  to check 
 To reinstall/update the Client start the Container with ```-e CLIENTUPDATE=1```
 With ```-e CLIENTUPDATE=2``` the latest Beta Version will be downloaded.
 The old Installer will be renamed and then the actual one will be downloaded.
+With ```-e CLIENTUPDATE=3``` you must place the install_backblaze.exe manual into the C: Drive.
 After this the Installation will start. Go to the VNC Server to complete. The Client will start automaticaly after this.
 When you restart the complete Container set 'CLIENTUPDATE' back to 0.
 </details><br/>

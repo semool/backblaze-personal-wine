@@ -178,8 +178,9 @@ if [ "$CLIENTUPDATE" != "0" ]; then
   configure_wine
   if [ "$CLIENTUPDATE" == "1" ]; then echo "Client Update Mode ON!"; fi
   if [ "$CLIENTUPDATE" == "2" ]; then echo "Client Update Mode ON for BETA VERSION!"; fi
+  if [ "$CLIENTUPDATE" == "3" ]; then echo "Client Reinstall Mode ON!"; fi
   DATE=$(date '+%Y-%m-%d-%H.%M')
-  if [ -e $WINEPREFIX/drive_c/install_backblaze.exe ]; then
+  if [ -e $WINEPREFIX/drive_c/install_backblaze.exe -a "$CLIENTUPDATE" != "3" ]; then
     echo "Renaming old Installer to: $WINEPREFIX/drive_c/install_backblaze.exe_$DATE"
     mv -f $WINEPREFIX/drive_c/install_backblaze.exe $WINEPREFIX/drive_c/install_backblaze.exe_$DATE
   fi
@@ -198,7 +199,12 @@ fi
 if [ -f "$BZPATHUI" ]; then
   configure_wine
   if [ "$GETARCH" == "32" ]; then rename_x64; fi
+  echo "Backblaze found..."
+  echo "- Starting the Backblaze Tray Symbol"
+  wine "$RUNTRAY" &
+  echo "- Sleeping 10 Seconds..."
+  sleep 10
   echo "- Starting the Backblaze client GUI"
-  wine "$RUNUI" -noquiet &
+  wine "$RUNUI" -quiet &
   sleep infinity
 fi
