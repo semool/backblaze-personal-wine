@@ -204,7 +204,8 @@ if [ -f "$BZPATHUI" ]; then
   wine "$RUNTRAY" &
   echo "- Sleeping 10 Seconds..."
   sleep 10
-  echo "- Starting the Backblaze client GUI"
+  echo "- Starting the Backblaze client GUI in silent mode"
+  echo "  Use the Tray Icon to open the Main Gui"
   wine "$RUNUI" -quiet &
   sleep infinity
 fi
