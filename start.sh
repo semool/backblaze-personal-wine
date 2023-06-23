@@ -1,35 +1,20 @@
 #!/bin/bash
 
-GETARCH=`getconf LONG_BIT`
-echo "Detected Arch: $GETARCH bit"
-echo "---------------------------------------------------"
-
 echo $TZ > /etc/timezone
 echo "Setting Timezone to: $TZ"
 date
 echo "---------------------------------------------------"
 
 echo "Setting Language to: $LANG"
-if [ "$GETARCH" == "32" ]; then
-   export LANG=$LANG
-elif [ "$GETARCH" == "64" ]; then
-   localedef -i `echo $LANG | cut -d "." -f1` -c -f UTF-8 -A /usr/share/locale/locale.alias $LANG
-   export LANG=$LANG
-   export LANGUAGE=$LANG
-fi
+localedef -i `echo $LANG | cut -d "." -f1` -c -f UTF-8 -A /usr/share/locale/locale.alias $LANG
+export LANG=$LANG
+export LANGUAGE=$LANG
 echo "---------------------------------------------------"
 
-echo "Setting $GETARCH bit Path for Backblaze Installation"
-if [ "$GETARCH" == "32" ]; then
-   BZPATHROOT="$WINEPREFIX/drive_c/Program Files/Backblaze"
-   BZPATHUI="$WINEPREFIX/drive_c/Program Files/Backblaze/bzbui.exe"
-   RUNTRAY="C:\Program Files\Backblaze\bzbuitray.exe"
-   RUNUI="C:\Program Files\Backblaze\bzbui.exe"
-elif [ "$GETARCH" == "64" ]; then
-   BZPATHUI="$WINEPREFIX/drive_c/Program Files (x86)/Backblaze/bzbui.exe"
-   RUNTRAY="C:\Program Files (x86)\Backblaze\bzbuitray.exe"
-   RUNUI="C:\Program Files (x86)\Backblaze\bzbui.exe"
-fi
+echo "Setting Path Variables for Backblaze"
+BZPATHUI="$WINEPREFIX/drive_c/Program Files (x86)/Backblaze/bzbui.exe"
+RUNTRAY="C:\Program Files (x86)\Backblaze\bzbuitray.exe"
+RUNUI="C:\Program Files (x86)\Backblaze\bzbui.exe"
 echo "---------------------------------------------------"
 
 if [ "$VNCPASSWORD" != "none" ]; then
@@ -130,45 +115,26 @@ function configure_wine {
   wine reg add "HKCU\\Control Panel\\Desktop\\" /v FontSmoothingGamma /t REG_DWORD /f /d 578 &>/dev/null
   wine reg add "HKCU\\Control Panel\\Desktop\\" /v FontSmoothingOrientation /t REG_DWORD /f /d 1 &>/dev/null
   wine reg add "HKCU\\Control Panel\\Desktop\\" /v FontSmoothingType /t REG_DWORD /f /d 2 &>/dev/null
-  if [ "$GETARCH" == "32" ]; then
-     echo "- Disable the Debugger"
-     wine reg delete "HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AeDebug" /f &>/dev/null
-  fi
   echo "---------------------------------------------------"
-}
-
-function rename_x64 {
-  if [ -e "$BZPATHROOT/x64" -o -f "$BZPATHROOT/bzfilelist64.exe" -o -f "$BZPATHROOT/bztransmit64.exe" ]; then
-     echo "Renaming x64 Binaries"
-     if [ -e "$BZPATHROOT/x64" ]; then
-        if [ -e "$BZPATHROOT/x64-DISABLED" ]; then rm -rf "$BZPATHROOT/x64-DISABLED"; fi
-        mv -f "$BZPATHROOT/x64" "$BZPATHROOT/x64-DISABLED"
-     fi
-     if [ -e "$BZPATHROOT/bzfilelist64.exe" ]; then mv -f "$BZPATHROOT/bzfilelist64.exe" "$BZPATHROOT/bzfilelist64.exe-DISABLED"; fi
-     if [ -e "$BZPATHROOT/bztransmit64.exe" ]; then mv -f "$BZPATHROOT/bztransmit64.exe" "$BZPATHROOT/bztransmit64.exe-DISABLED"; fi
-     echo "---------------------------------------------------"
-  fi
 }
 
 function install_backblaze {
-  echo "Backblaze installer started, please go through the graphical setup by logging onto the containers (no)VNC server"
+  echo "Backblaze Installer started, please go through the graphical Setup by logging onto the Containers (no)VNC server"
   wine $WINEPREFIX/drive_c/install_backblaze.exe
   echo "---------------------------------------------------"
   echo "Installation finished or aborted! Lets check..."
-  echo "---------------------------------------------------"
-  if [ "$GETARCH" == "32" ]; then rename_x64; fi
-  echo "Trying to start the Backblaze client..."
+  echo "Trying to start the Backblaze Client..."
   wineserver -k
 }
 
 until [ -f "$BZPATHUI" ]; do
-  echo "Backblaze not installed - Initializing the wine prefix..."
+  echo "Backblaze not installed - Initializing the Wine prefix..."
   wineboot -i -u
   echo "---------------------------------------------------"
   configure_wine
   if [ ! -e $WINEPREFIX/drive_c/install_backblaze.exe ]; then
-     echo "Downloading the Backblaze personal installer..."
-     wget -O $WINEPREFIX/drive_c/install_backblaze.exe https://secure.backblaze.com/api/install_backblaze?file=bzinstall-win32-8.5.0.659.exe
+     echo "Downloading Backblaze Personal Final Installer..."
+     wget -O $WINEPREFIX/drive_c/install_backblaze.exe https://www.backblaze.com/win32/install_backblaze.exe
      echo "---------------------------------------------------"
   fi
   install_backblaze
@@ -185,10 +151,10 @@ if [ "$CLIENTUPDATE" != "0" ]; then
     mv -f $WINEPREFIX/drive_c/install_backblaze.exe $WINEPREFIX/drive_c/install_backblaze.exe_$DATE
   fi
   if [ "$CLIENTUPDATE" == "1" ]; then
-    echo "Downloading the Backblaze personal latest Final installer..."
+    echo "Downloading Backblaze Personal Final Installer..."
     wget https://www.backblaze.com/win32/install_backblaze.exe -P $WINEPREFIX/drive_c/
   elif [ "$CLIENTUPDATE" == "2" ]; then
-    echo "Downloading the Backblaze personal BETA installer..."
+    echo "Downloading the Backblaze Personal BETA Installer..."
     wget https://f000.backblazeb2.com/file/backblazefiles/install_backblaze.exe -P $WINEPREFIX/drive_c/
   fi
   CLIENTUPDATE=0
@@ -198,14 +164,14 @@ fi
 
 if [ -f "$BZPATHUI" ]; then
   configure_wine
-  if [ "$GETARCH" == "32" ]; then rename_x64; fi
   echo "Backblaze found..."
   echo "- Starting the Backblaze Tray Symbol"
   wine "$RUNTRAY" &
-  echo "- Sleeping 10 Seconds..."
-  sleep 10
-  echo "- Starting the Backblaze client GUI in silent mode"
+  echo "--------------------------------------------------"
+  echo "- Go into the Container Shell with:"
+  echo "  docker exec -it backblaze bash"
+  echo "  And then run the following command:"
+  echo "  wine \"C:\Program Files (x86)\Backblaze\bzbui.exe\" -quiet &"
   echo "  Use the Tray Icon to open the Main Gui"
-  wine "$RUNUI" -quiet &
   sleep infinity
 fi

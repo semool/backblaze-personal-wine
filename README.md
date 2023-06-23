@@ -1,6 +1,5 @@
 ![Last Commit](https://img.shields.io/github/last-commit/semool/backblaze-personal-wine?style=flat-square)
-![x86 Image Size (compressed)](https://img.shields.io/docker/image-size/loomes/backblaze-personal-wine/x86.alpine?color=magenta&label=x86%20Image%20%28compressed%29&style=flat-square)
-![x64 Image Size (compressed)](https://img.shields.io/docker/image-size/loomes/backblaze-personal-wine/x64.debian?color=magenta&label=x64%20Image%20%28compressed%29&style=flat-square)
+![Image Size (compressed)](https://img.shields.io/docker/image-size/loomes/backblaze-personal-wine/x64.debian?color=magenta&label=x64%20Image%20%28compressed%29&style=flat-square)
 ![Docker Pulls](https://img.shields.io/docker/pulls/loomes/backblaze-personal-wine?style=flat-square)
 
 ## Infos
@@ -9,9 +8,7 @@ Then look no further, this container automatically creates a tiny Wine prefix th
 Please note, Linux specific file attributes (like ownership, acls or permissions) will not be backed up.
 
 * The original x86 Image comes from [tom300z](https://github.com/tom300z/backblaze-personal-wine)
-* Multi Dockerfile for x86 and x64
-* (x86) Alpine version 3.13.12, Wine 4.0.3, Image Size only ~348MB!
-* (x64) Debian 10 Buster, Wine 4.0.4, Image Size ~956MB!
+* Debian 10 Buster (x64), Wine 4.0.4, Image Size ~956MB!
 * Adding user configurable LANGUAGE and TIMEZONE. Defaults are 'en_US.UTF-8' and 'Etc/UTC'
 * Disable openbox right click root menu (not needed)
 * Install a dark [Theme (Afterpiece)](https://github.com/terroo/openbox-themes/tree/main/Afterpiece) for Openbox
@@ -21,23 +18,14 @@ Please note, Linux specific file attributes (like ownership, acls or permissions
 * Making the virtual Display Size configurable (Default: 910x740)
 * Adding ENV to initiate a Client Redownload/Update
 * Changing Wine DPI and activate Font Smoothing
-* (x86) Disable Wine Debugger
-* (x86) Workaround for fontconfig cache file spam in /var/cache/fontconfig
-
-### The x64 Image
-It runs fine. But i prefer the x86 one. Its smaller. The only x64 Binaries from the Client are the list and transfer ones. I haven't noticed any benefits from the x64.
 
 ## Container Build Instructions
 <details>
   <summary>Click to expand!</summary>
 
-### To build the x86 Version:
+### To build the Image:
 ```
-docker build -t backblaze-personal-wine:x86.alpine .
-```
-### To build the x64 Version:
-```
-docker build -t backblaze-personal-wine:x64.debian --build-arg BASEIMAGE="amd64/debian:buster-slim" .
+docker build -t backblaze-personal-wine:x64.debian .
 ```
 </details><br/>
   
@@ -57,7 +45,7 @@ docker run -d \
     -v /mnt/backupfolder2:/data/backupfolder2 \ #<- A Folder that should be Backuped
     --name=backblaze \
     --restart=always \
-    backblaze-personal-wine:x86.alpine # <- or x64.debian
+    backblaze-personal-wine:x64.debian
 ```
 
 ### Advanced
@@ -82,7 +70,7 @@ docker run -d \
     -v /mnt/backupfolder2:/data/e__backupfolder2 \ #<- A Folder that should be Backuped, first Part is the Drive Letter to mount
     --name=backblaze \
     --restart=always \
-    backblaze-personal-wine:x86.alpine # <- or x64.debian
+    backblaze-personal-wine:x64.debian
 ```
 </details><br/>
 

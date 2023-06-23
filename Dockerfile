@@ -1,4 +1,3 @@
-ARG BASEIMAGE="i386/alpine:3.13.12"
 FROM i386/alpine:3.13.12 AS builder
 
 # Create Builder Image
@@ -35,8 +34,7 @@ RUN \
     rm -r $NOVNCPATH/.git* $NOVNCPATH/utils/websockify/.git*
     #--------------
 
-FROM $BASEIMAGE
-ARG BASEIMAGE
+FROM amd64/debian:buster-slim
 
 # Not needed for Alpine and Debian Images, but for Ubuntu
 #ENV DEBIAN_FRONTEND=noninteractive
@@ -55,61 +53,38 @@ COPY --from=builder /openbox-themes/Afterpiece ./root/.themes/Afterpiece
 
 # Build Final Image
 RUN \
-    # Set arch version
-    if [ "$BASEIMAGE" = "i386/alpine:3.13.12" ]; then ARCH="32"; \
-    elif [ "$BASEIMAGE" = "amd64/debian:buster-slim" ]; then ARCH="64" && DISTRO="debian" && DISTROVERSION="buster"; else \
-    echo -e "\033[0;31m!!!!!WARNING!!!!! BASEIMAGE must be 'i386/alpine:3.13.12' or 'amd64/debian:buster-slim'! EXIT BUILD !!!!!WARNING!!!!!\033[0m" && exit 1; \
-    fi && \
+    DISTRO="debian" && \
+    DISTROVERSION="buster" && \
+    # Add i386
+    dpkg --add-architecture i386 && \
     #--------------
-    # Install Packages x86
-    if [ "$ARCH" = "32" ]; then \
-       # Install required packages
-       apk --update --upgrade --no-cache add \
-       wine xvfb x11vnc openbox samba-winbind-clients tzdata musl-locales \
-       # for noVNC
-       bash python3 procps openssl \
-       # numpy for noVNC - optional, not needed for this purpose
-       #py3-numpy \
-       #--------------
-       ; \
-    fi && \
+    # Install required packages
+    apt-get update && \
+    apt-get upgrade -y && \
+    apt-get --no-install-recommends install \
+    xvfb x11vnc openbox wget locales tzdata ca-certificates \
+    fonts-dejavu fonts-liberation fonts-wine \
+    #wine wine32 wine64 \
+    # for noVNC
+    python3 procps openssl \
+    # numpy for noVNC - optional, not needed for this purpose
+    #python3-numpy \
+    -y && \
     #--------------
-    # Install Packages x64
-    if [ "$ARCH" = "64" ]; then \
-       # Add i386
-       dpkg --add-architecture i386 && \
-       #--------------
-       # Install required packages
-       apt-get update && \
-       apt-get upgrade -y && \
-       apt-get --no-install-recommends install \
-       xvfb x11vnc openbox wget locales tzdata ca-certificates \
-       fonts-dejavu fonts-liberation fonts-wine \
-       #wine wine32 wine64 \
-       # for noVNC
-       python3 procps openssl \
-       # numpy for noVNC - optional, not needed for this purpose
-       #python3-numpy \
-       -y \
-       #--------------
-       # Install WineHQ
-       && \
-       WINEDISTRO="$DISTROVERSION" && \
-       WINEBRANCH="stable" && \
-       WINEVERSION="4.0.4~$DISTROVERSION" && \
-       mkdir -p /etc/apt/keyrings && \
-       wget --no-check-certificate -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key && \
-       wget --no-check-certificate -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/$DISTRO/dists/$WINEDISTRO/winehq-$WINEDISTRO.sources && \
-       apt-get update && \
-       apt-get --no-install-recommends install \
-       winehq-$WINEBRANCH=$WINEVERSION \
-       wine-$WINEBRANCH=$WINEVERSION \
-       wine-$WINEBRANCH-amd64=$WINEVERSION \
-       wine-$WINEBRANCH-i386=$WINEVERSION \
-       -y \
-       #--------------
-       ; \
-    fi && \
+    # Install WineHQ
+    WINEDISTRO="$DISTROVERSION" && \
+    WINEBRANCH="stable" && \
+    WINEVERSION="4.0.4~$DISTROVERSION" && \
+    mkdir -p /etc/apt/keyrings && \
+    wget --no-check-certificate -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key && \
+    wget --no-check-certificate -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/$DISTRO/dists/$WINEDISTRO/winehq-$WINEDISTRO.sources && \
+    apt-get update && \
+    apt-get --no-install-recommends install \
+    winehq-$WINEBRANCH=$WINEVERSION \
+    wine-$WINEBRANCH=$WINEVERSION \
+    wine-$WINEBRANCH-amd64=$WINEVERSION \
+    wine-$WINEBRANCH-i386=$WINEVERSION \
+    -y && \
     #--------------
     # Rebuild Font Cache
     fc-cache -f /usr/share/fonts/Microsoft/TrueType/SegoeUI && \
@@ -132,29 +107,13 @@ RUN \
     # Create wineprefix and data dir
     mkdir /wine /data && \
     #--------------
-    # Cleanup x86
-    if [ "$ARCH" = "32" ]; then \
-       # Workaround for fontconfig invalid cache files spam - BUG!
-       rm -r /usr/share/fonts/100dpi \
-             /usr/share/fonts/75dpi \
-             /usr/share/fonts/cyrillic \
-             /usr/share/fonts/encodings \
-             /usr/share/fonts/misc \
-             /var/cache/fontconfig && \
-       ln -s /dev/null /var/cache/fontconfig \
-       #--------------
-       ; \
-    fi && \
-    #--------------
-    # Cleanup x64
-    if [ "$ARCH" = "64" ]; then \
-       apt-get autoremove -y && \
-       apt-get clean && \
-       rm -rf /var/cache/fontconfig/* \
-             /var/lib/apt/lists/* \
-             /usr/share/doc \
-       ; \
-    fi && \
+    # Cleanup
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/cache/fontconfig/* \
+          /var/lib/apt/lists/* \
+         /usr/share/doc \
+    && \
     #--------------
     # get start.sh direct from Github
     wget --no-check-certificate https://raw.githubusercontent.com/semool/backblaze-personal-wine/master/start.sh && \
